@@ -1,11 +1,12 @@
 {
   "name": "ASL Tech Support",
   "short_name": "ASL Tech",
-  "start_url": "/index.html",
+  "start_url": "/asl-tech-support/index.html",
+  "scope": "/asl-tech-support/",
   "display": "standalone",
   "background_color": "#0a1628",
   "theme_color": "#0a1628",
   "icons": [
-    { "src": "ASL_icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/asl-tech-support/ASL_icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
