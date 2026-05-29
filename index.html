@@ -477,10 +477,25 @@ body {
   .form-group.full { grid-column: span 1; }
 }
 @media (max-width: 600px) {
-  #sidebar { width: 48px; }
+  :root { --sidebar-w: 48px; }
+  #sidebar { width: 48px; overflow: hidden; }
+  .nav-item { padding: 13px 0; justify-content: center; }
   .nav-item span.nav-label { display: none; }
-  .dashboard-grid { grid-template-columns: 1fr; }
+  .nav-icon { font-size: 18px; width: auto; }
+  .nav-separator { margin: 6px 8px; }
+  #content { padding: 12px; }
+  .dashboard-grid { grid-template-columns: 1fr; gap: 12px; }
   .dash-card.notes { grid-column: span 1; }
+  .module-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .module-title { font-size: 15px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: span 1; }
+  .modal-box { padding: 18px; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .data-table th, .data-table td { padding: 8px 8px; font-size: 11px; }
+  .topbar-title { display: none; }
+  .topbar-time { display: none; }
+  #topbar { padding: 0 12px; }
 }
 </style>
 </head>
