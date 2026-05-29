@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>ASL Technical Support Platform</title>
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/asl-tech-support/manifest.json">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1628'/%3E%3Cpolygon points='6,32 22,12 28,12 12,32 28,52 22,52' fill='%23f26522'/%3E%3Cpolygon points='14,32 28,15 33,15 19,32 33,49 28,49' fill='%23e8a020' opacity='.75'/%3E%3Ctext x='34' y='38' font-family='Arial Black,Arial' font-size='18' font-weight='900' fill='%23f0f4fa' letter-spacing='1'%3EASL%3C/text%3E%3Crect x='34' y='41' width='26' height='2' fill='%23e8a020' opacity='.6'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1628'/%3E%3Cpolygon points='14,90 58,34 74,34 30,90 74,146 58,146' fill='%23f26522'/%3E%3Cpolygon points='36,90 74,38 86,38 48,90 86,142 74,142' fill='%23e8a020' opacity='.75'/%3E%3Ctext x='92' y='108' font-family='Arial Black,Arial' font-size='52' font-weight='900' fill='%23f0f4fa' letter-spacing='2'%3EASL%3C/text%3E%3Crect x='92' y='116' width='76' height='4' fill='%23e8a020' opacity='.6'/%3E%3C/svg%3E">
 <style>
@@ -1473,7 +1473,7 @@ function delHistorial(id) {
 // ═══════════════════════════════════════════════════════════
 let swReg = null;
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js').then(reg => {
+  navigator.serviceWorker.register('/asl-tech-support/service-worker.js').then(reg => {
     swReg = reg;
     console.log('SW registered');
   }).catch(e => console.log('SW error', e));
