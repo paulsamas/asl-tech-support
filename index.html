@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>ASL Technical Support Platform</title>
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1628'/%3E%3Cpolygon points='6,32 22,12 28,12 12,32 28,52 22,52' fill='%23f26522'/%3E%3Cpolygon points='14,32 28,15 33,15 19,32 33,49 28,49' fill='%23e8a020' opacity='.75'/%3E%3Ctext x='34' y='38' font-family='Arial Black,Arial' font-size='18' font-weight='900' fill='%23f0f4fa' letter-spacing='1'%3EASL%3C/text%3E%3Crect x='34' y='41' width='26' height='2' fill='%23e8a020' opacity='.6'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1628'/%3E%3Cpolygon points='14,90 58,34 74,34 30,90 74,146 58,146' fill='%23f26522'/%3E%3Cpolygon points='36,90 74,38 86,38 48,90 86,142 74,142' fill='%23e8a020' opacity='.75'/%3E%3Ctext x='92' y='108' font-family='Arial Black,Arial' font-size='52' font-weight='900' fill='%23f0f4fa' letter-spacing='2'%3EASL%3C/text%3E%3Crect x='92' y='116' width='76' height='4' fill='%23e8a020' opacity='.6'/%3E%3C/svg%3E">
 <style>
@@ -572,6 +573,11 @@ body {
         <span class="nav-icon">👤</span>
         <span class="nav-label">Contactos</span>
       </div>
+      <div class="nav-separator"></div>
+      <div class="nav-item" onclick="showView('scheduler')" data-view="scheduler">
+        <span class="nav-icon">🔔</span>
+        <span class="nav-label">Scheduler</span>
+      </div>
     </div>
 
     <!-- Content -->
@@ -724,7 +730,7 @@ function showView(view) {
     case 'atl':       content.innerHTML = renderATL(); break;
     case 'hil':       content.innerHTML = renderHIL(); break;
     case 'historial': content.innerHTML = renderHistorial(); break;
-    case 'contacts':  content.innerHTML = renderContacts(); break;
+    case 'scheduler': content.innerHTML = renderScheduler(); bindScheduler(); break;
   }
 }
 
@@ -1448,8 +1454,147 @@ function delHistorial(id) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// CONTACTS
+// SERVICE WORKER REGISTRATION
 // ═══════════════════════════════════════════════════════════
+let swReg = null;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js').then(reg => {
+    swReg = reg;
+    console.log('SW registered');
+  }).catch(e => console.log('SW error', e));
+}
+
+// ═══════════════════════════════════════════════════════════
+// SCHEDULER
+// ═══════════════════════════════════════════════════════════
+let schedules = [];
+let schedTimers = [];
+
+function renderScheduler() {
+  const rows = schedules.length ? schedules.map((s,i) => `
+    <tr>
+      <td>${s.time}</td>
+      <td>${s.title}</td>
+      <td>${s.body}</td>
+      <td><span class="status-tag ${s.fired?'s-closed':'s-open'}">${s.fired?'Sent':'Pending'}</span></td>
+      <td><button class="btn-sm btn-del" onclick="deleteSchedule(${i})">Del</button></td>
+    </tr>`).join('') :
+    '<tr><td colspan="5" style="text-align:center;color:var(--asl-grey);padding:20px">No notifications scheduled</td></tr>';
+
+  return `
+  <div class="module-header">
+    <div>
+      <div class="module-title">🔔 Notification Scheduler</div>
+      <div class="module-subtitle">Schedule notifications for your iPhone lock screen</div>
+    </div>
+  </div>
+
+  <div class="detail-section" style="margin-bottom:20px">
+    <div class="detail-section-title">How to activate</div>
+    <div style="font-size:12px;line-height:1.8;color:var(--asl-grey)">
+      1. Open this page in Safari on iPhone → Share → <b style="color:var(--asl-white)">Add to Home Screen</b><br>
+      2. Open the app from your home screen (not Safari directly)<br>
+      3. When prompted, tap <b style="color:var(--asl-accent)">Allow</b> notifications<br>
+      4. Schedule your notifications below — they will appear on your lock screen
+    </div>
+  </div>
+
+  <div class="dash-card" style="margin-bottom:20px">
+    <div class="dash-card-header"><span class="dash-card-title">New Notification</span></div>
+    <div class="form-grid" style="margin-bottom:14px">
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="sch-time">
+      </div>
+      <div class="form-group">
+        <label>Title (e.g. 📞 Llamada de Jerry)</label>
+        <input type="text" id="sch-title" placeholder="📞 Llamada de Jerry">
+      </div>
+      <div class="form-group full">
+        <label>Message (optional)</label>
+        <input type="text" id="sch-body" placeholder="ASL Tech Support">
+      </div>
+    </div>
+    <button class="btn-primary" id="sch-add-btn">+ Add Notification</button>
+    <div id="notif-permission" style="margin-top:12px;font-size:12px;color:var(--asl-grey)"></div>
+  </div>
+
+  <div style="overflow-x:auto">
+  <table class="data-table">
+    <thead><tr><th>Time</th><th>Title</th><th>Message</th><th>Status</th><th>Del</th></tr></thead>
+    <tbody id="sch-rows">${rows}</tbody>
+  </table></div>`;
+}
+
+function bindScheduler() {
+  document.getElementById('sch-add-btn').addEventListener('click', addSchedule);
+  checkNotifPermission();
+}
+
+function checkNotifPermission() {
+  const el = document.getElementById('notif-permission');
+  if (!el) return;
+  if (!('Notification' in window)) {
+    el.innerHTML = '<span style="color:var(--asl-danger)">⚠ Notifications not supported in this browser. Use Safari and add to Home Screen.</span>';
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    el.innerHTML = '<span style="color:var(--asl-success)">✔ Notifications enabled</span>';
+  } else if (Notification.permission === 'denied') {
+    el.innerHTML = '<span style="color:var(--asl-danger)">✘ Notifications blocked. Enable in iPhone Settings → Safari → Notifications.</span>';
+  } else {
+    el.innerHTML = '<span style="color:var(--asl-warn)">⚠ Permission needed. <button class="btn-sm btn-edit" onclick="requestNotifPermission()">Enable Notifications</button></span>';
+  }
+}
+
+function requestNotifPermission() {
+  Notification.requestPermission().then(p => {
+    checkNotifPermission();
+    if (p === 'granted') showToast('Notifications enabled!', 'success');
+  });
+}
+
+function addSchedule() {
+  const time = document.getElementById('sch-time').value;
+  const title = document.getElementById('sch-title').value.trim();
+  const body = document.getElementById('sch-body').value.trim() || 'ASL Tech Support';
+
+  if (!time) { showToast('Select a time', 'error'); return; }
+  if (!title) { showToast('Enter a title', 'error'); return; }
+
+  const now = new Date();
+  const [h, m] = time.split(':').map(Number);
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+  if (target <= now) target.setDate(target.getDate() + 1); // next day if past
+  const delay = target - now;
+
+  const entry = { time, title, body, fired: false, target: target.toISOString() };
+  schedules.push(entry);
+  const idx = schedules.length - 1;
+
+  // Schedule via SW if available, else fallback to setTimeout
+  if (swReg && Notification.permission === 'granted') {
+    swReg.active.postMessage({ type: 'SCHEDULE', title, body, delay });
+  } else if (Notification.permission === 'granted') {
+    schedTimers.push(setTimeout(() => {
+      new Notification(title, { body, icon: './ASL_icon.png' });
+      schedules[idx].fired = true;
+    }, delay));
+  } else {
+    requestNotifPermission();
+  }
+
+  const mins = Math.round(delay / 60000);
+  showToast(`Scheduled in ${mins} min`, 'success');
+  showView('scheduler');
+}
+
+function deleteSchedule(i) {
+  schedules.splice(i, 1);
+  showView('scheduler');
+  showToast('Deleted', 'success');
+}
+
 const departments = [
   { dept:'Captain Office', ext:'+32 4 220 1101', icon:'✈' },
   { dept:'Maintenance Manager', ext:'+32 4 220 1127', icon:'🔧' },
