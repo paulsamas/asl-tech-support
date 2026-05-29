@@ -5,7 +5,7 @@ self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(clients.matchAll({type:'window'}).then(list => {
     if (list.length) return list[0].focus();
-    return clients.openWindow('/');
+    return clients.openWindow('/asl-tech-support/');
   }));
 });
 
@@ -15,8 +15,8 @@ self.addEventListener('message', e => {
     setTimeout(() => {
       self.registration.showNotification(title, {
         body: body,
-        icon: '/ASL_icon.png',
-        badge: '/ASL_icon.png',
+        icon: '/asl-tech-support/ASL_icon.png',
+        badge: '/asl-tech-support/ASL_icon.png',
         vibrate: [500, 200, 500, 200, 500],
         requireInteraction: true,
         tag: 'asl-call-' + Date.now()
