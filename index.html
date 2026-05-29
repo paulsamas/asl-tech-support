@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ASL Technical Support Platform</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1628'/%3E%3Cpolygon points='6,32 22,12 28,12 12,32 28,52 22,52' fill='%23f26522'/%3E%3Cpolygon points='14,32 28,15 33,15 19,32 33,49 28,49' fill='%23e8a020' opacity='.75'/%3E%3Ctext x='34' y='38' font-family='Arial Black,Arial' font-size='18' font-weight='900' fill='%23f0f4fa' letter-spacing='1'%3EASL%3C/text%3E%3Crect x='34' y='41' width='26' height='2' fill='%23e8a020' opacity='.6'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1628'/%3E%3Cpolygon points='14,90 58,34 74,34 30,90 74,146 58,146' fill='%23f26522'/%3E%3Cpolygon points='36,90 74,38 86,38 48,90 86,142 74,142' fill='%23e8a020' opacity='.75'/%3E%3Ctext x='92' y='108' font-family='Arial Black,Arial' font-size='52' font-weight='900' fill='%23f0f4fa' letter-spacing='2'%3EASL%3C/text%3E%3Crect x='92' y='116' width='76' height='4' fill='%23e8a020' opacity='.6'/%3E%3C/svg%3E">
+<style>
+:root {
+  --asl-navy: #0a1628;
+  --asl-blue: #1a3a6e;
+  --asl-mid: #1e4d8c;
+  --asl-accent: #e8a020;
+  --asl-orange: #f26522;
+  --asl-light: #d4e4f7;
+  --asl-white: #f0f4fa;
+  --asl-grey: #8a9bb5;
+  --asl-dark: #060e1c;
+  --asl-success: #1db87a;
+  --asl-danger: #e03e3e;
+  --asl-warn: #e8a020;
+  --asl-diff: #8b5cf6;
+  --sidebar-w: 200px;
+  --font-main: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-main);
+  background: var(--asl-navy);
+  color: var(--asl-white);
+  min-height: 100vh;
+  font-size: 13px;
+}
+
+/* ══ LOGIN ══ */
+#login-screen {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, var(--asl-dark) 0%, var(--asl-navy) 50%, #0d2147 100%);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.login-bg-stripe {
+  position: absolute; top: 0; left: 0; width: 100%; height: 6px;
+  background: linear-gradient(90deg, var(--asl-orange), var(--asl-accent), var(--asl-mid));
+}
+.login-box {
+  background: rgba(10,22,40,0.95);
+  border: 1px solid rgba(232,160,32,0.3);
+  border-radius: 12px;
+  padding: 48px 40px 40px;
+  width: 380px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+  position: relative;
+}
+.login-logo {
+  text-align: center; margin-bottom: 32px;
+}
+.logo-svg { width: 200px; height: 70px; }
+.login-subtitle {
+  text-align: center; color: var(--asl-grey); font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px;
+  border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;
+}
+.login-field { margin-bottom: 16px; }
+.login-field label {
+  display: block; font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--asl-grey); margin-bottom: 6px;
+}
+.login-field input {
+  width: 100%; padding: 11px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px; color: var(--asl-white);
+  font-size: 14px; font-family: var(--font-main);
+  transition: border-color .2s;
+}
+.login-field input:focus {
+  outline: none; border-color: var(--asl-accent);
+  background: rgba(232,160,32,0.05);
+}
+.login-btn {
+  width: 100%; padding: 12px;
+  background: linear-gradient(90deg, var(--asl-orange), var(--asl-accent));
+  border: none; border-radius: 6px; color: #fff;
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer; margin-top: 8px;
+  transition: opacity .2s, transform .1s;
+}
+.login-btn:hover { opacity: .9; transform: translateY(-1px); }
+.login-btn:active { transform: translateY(0); }
+.login-error {
+  color: var(--asl-danger); font-size: 11px;
+  text-align: center; margin-top: 10px; display: none;
+}
+
+/* ══ APP SHELL ══ */
+#app { display: none; height: 100vh; flex-direction: column; }
+
+/* Top bar */
+#topbar {
+  height: 48px; background: var(--asl-dark);
+  border-bottom: 2px solid var(--asl-accent);
+  display: flex; align-items: center; padding: 0 20px;
+  gap: 16px; flex-shrink: 0;
+}
+.topbar-logo { display: flex; align-items: center; gap: 10px; }
+.topbar-logo svg { width: 80px; height: 28px; }
+.topbar-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); }
+.topbar-title {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--asl-grey);
+}
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.topbar-user {
+  font-size: 11px; color: var(--asl-accent); letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.topbar-time { font-size: 11px; color: var(--asl-grey); font-variant-numeric: tabular-nums; }
+.btn-logout {
+  padding: 5px 12px; border: 1px solid rgba(255,255,255,0.15);
+  background: transparent; color: var(--asl-grey);
+  border-radius: 4px; cursor: pointer; font-size: 11px;
+  transition: all .2s;
+}
+.btn-logout:hover { border-color: var(--asl-danger); color: var(--asl-danger); }
+
+/* Main layout */
+#main-layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ══ SIDEBAR ══ */
+#sidebar {
+  width: var(--sidebar-w); background: var(--asl-dark);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; flex-shrink: 0;
+  padding-top: 8px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 18px; cursor: pointer; color: var(--asl-grey);
+  font-size: 12px; letter-spacing: .5px; border-left: 3px solid transparent;
+  transition: all .15s; user-select: none;
+}
+.nav-item:hover { color: var(--asl-white); background: rgba(255,255,255,0.04); }
+.nav-item.active {
+  color: var(--asl-accent); border-left-color: var(--asl-accent);
+  background: rgba(232,160,32,0.07);
+}
+.nav-icon { font-size: 15px; width: 18px; text-align: center; }
+.nav-separator { height: 1px; background: rgba(255,255,255,0.06); margin: 8px 16px; }
+
+/* ══ CONTENT AREA ══ */
+#content { flex: 1; overflow-y: auto; padding: 20px; background: #0d1e35; }
+
+/* ══ DASHBOARD ══ */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+.dash-card {
+  background: var(--asl-navy);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 16px;
+  position: relative; overflow: hidden;
+}
+.dash-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.dash-card.aog::before { background: var(--asl-danger); }
+.dash-card.hil::before { background: var(--asl-diff); }
+.dash-card.wo::before { background: var(--asl-warn); }
+.dash-card.atl::before { background: var(--asl-mid); }
+.dash-card.notes::before { background: var(--asl-success); }
+.dash-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.dash-card-title {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--asl-grey);
+}
+.dash-badge {
+  font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700;
+}
+.badge-danger { background: rgba(224,62,62,.2); color: var(--asl-danger); }
+.badge-warn { background: rgba(232,160,32,.2); color: var(--asl-warn); }
+.badge-diff { background: rgba(139,92,246,.2); color: var(--asl-diff); }
+.badge-blue { background: rgba(30,77,140,.4); color: var(--asl-light); }
+.badge-success { background: rgba(29,184,122,.2); color: var(--asl-success); }
+
+.dash-card.notes { grid-column: span 3; }
+
+.dash-item {
+  padding: 8px 10px; background: rgba(255,255,255,0.03);
+  border-radius: 6px; margin-bottom: 6px;
+  cursor: pointer; transition: background .15s;
+  border-left: 2px solid transparent;
+}
+.dash-item:hover { background: rgba(255,255,255,0.07); }
+.dash-item.aog-item { border-left-color: var(--asl-danger); }
+.dash-item.hil-item { border-left-color: var(--asl-diff); }
+.dash-item.wo-item { border-left-color: var(--asl-warn); }
+.dash-item.atl-item { border-left-color: var(--asl-mid); }
+.dash-item-reg {
+  font-size: 11px; font-weight: 700; color: var(--asl-accent);
+  margin-bottom: 2px;
+}
+.dash-item-title { font-size: 11px; color: var(--asl-white); margin-bottom: 2px; }
+.dash-item-meta { font-size: 10px; color: var(--asl-grey); }
+
+.empty-state {
+  text-align: center; padding: 20px; color: var(--asl-grey); font-size: 11px;
+}
+
+/* Notes area */
+.notes-area {
+  width: 100%; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;
+  color: var(--asl-white); padding: 10px; font-size: 12px;
+  font-family: var(--font-main); resize: vertical; min-height: 80px;
+}
+.notes-area:focus { outline: none; border-color: var(--asl-accent); }
+.btn-save-note {
+  margin-top: 8px; padding: 6px 16px;
+  background: var(--asl-success); border: none; border-radius: 4px;
+  color: #fff; font-size: 11px; font-weight: 700; cursor: pointer;
+}
+
+/* ══ MODULE VIEWS ══ */
+.module-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.module-title {
+  font-size: 18px; font-weight: 700; color: var(--asl-white);
+  letter-spacing: .5px;
+}
+.module-subtitle { font-size: 11px; color: var(--asl-grey); margin-top: 2px; }
+
+.btn-primary {
+  padding: 8px 18px; background: linear-gradient(90deg, var(--asl-orange), var(--asl-accent));
+  border: none; border-radius: 6px; color: #fff;
+  font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px;
+  transition: opacity .2s;
+}
+.btn-primary:hover { opacity: .85; }
+.btn-sm {
+  padding: 4px 10px; border-radius: 4px; font-size: 11px;
+  font-weight: 600; cursor: pointer; border: none; transition: opacity .2s;
+}
+.btn-sm:hover { opacity: .8; }
+.btn-edit { background: rgba(30,77,140,.5); color: var(--asl-light); }
+.btn-del { background: rgba(224,62,62,.3); color: #ff8080; }
+.btn-view { background: rgba(29,184,122,.2); color: var(--asl-success); }
+
+/* Table */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left; padding: 10px 12px; font-size: 10px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--asl-grey);
+  border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap;
+}
+.data-table td {
+  padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 12px; vertical-align: middle;
+}
+.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+.reg-tag {
+  display: inline-block; padding: 2px 8px;
+  background: rgba(232,160,32,0.15); color: var(--asl-accent);
+  border-radius: 4px; font-size: 11px; font-weight: 700;
+}
+.status-tag {
+  display: inline-block; padding: 2px 9px;
+  border-radius: 10px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.s-open { background: rgba(29,184,122,.15); color: var(--asl-success); }
+.s-closed { background: rgba(138,155,181,.15); color: var(--asl-grey); }
+.s-deferred { background: rgba(139,92,246,.2); color: var(--asl-diff); }
+.s-aog { background: rgba(224,62,62,.2); color: var(--asl-danger); }
+
+/* ══ MODAL ══ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal-box {
+  background: #0d1e35; border: 1px solid rgba(232,160,32,0.3);
+  border-radius: 12px; padding: 28px; width: 100%; max-width: 720px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.8);
+}
+.modal-title {
+  font-size: 16px; font-weight: 700; margin-bottom: 20px;
+  padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.07); border: none;
+  color: var(--asl-grey); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: rgba(224,62,62,.3); color: #fff; }
+
+/* Form */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid.cols-1 { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: span 2; }
+.form-group label {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--asl-grey);
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 9px 12px; background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+  color: var(--asl-white); font-size: 13px; font-family: var(--font-main);
+  transition: border-color .2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none; border-color: var(--asl-accent);
+}
+.form-group select option { background: #0d1e35; }
+.form-group textarea { resize: vertical; min-height: 72px; }
+
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;
+}
+.btn-cancel {
+  padding: 8px 18px; background: transparent;
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+  color: var(--asl-grey); font-size: 12px; cursor: pointer;
+}
+.btn-cancel:hover { border-color: var(--asl-grey); }
+
+/* Signature */
+.sig-btn {
+  padding: 8px 16px; background: rgba(255,255,255,0.05);
+  border: 1px dashed rgba(232,160,32,0.4); border-radius: 6px;
+  color: var(--asl-accent); cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sig-applied {
+  color: var(--asl-success); border-color: rgba(29,184,122,.4);
+  background: rgba(29,184,122,.05);
+}
+
+/* Detail view */
+.detail-section {
+  background: var(--asl-navy); border-radius: 8px;
+  padding: 16px; margin-bottom: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.detail-section-title {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--asl-accent); margin-bottom: 12px;
+}
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.detail-item label {
+  display: block; font-size: 10px; color: var(--asl-grey);
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px;
+}
+.detail-item .val {
+  font-size: 12px; color: var(--asl-white); line-height: 1.5;
+}
+
+/* HIL deadline colors */
+.deadline-urgent { color: var(--asl-danger); font-weight: 700; }
+.deadline-warn { color: var(--asl-warn); font-weight: 700; }
+.deadline-ok { color: var(--asl-success); }
+
+/* Contacts */
+.contacts-section { margin-bottom: 28px; }
+.contacts-title {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--asl-accent); margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid rgba(232,160,32,0.2);
+}
+.contact-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 14px; background: var(--asl-navy);
+  border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;
+  margin-bottom: 8px;
+}
+.contact-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--asl-mid), var(--asl-accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.contact-name { font-size: 13px; font-weight: 600; }
+.contact-role { font-size: 11px; color: var(--asl-grey); }
+.contact-phone { margin-left: auto; color: var(--asl-accent); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9000;
+  padding: 12px 20px; border-radius: 8px; font-size: 13px;
+  font-weight: 600; opacity: 0; transform: translateY(10px);
+  transition: all .3s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--asl-success); color: #fff; }
+.toast.error { background: var(--asl-danger); color: #fff; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+/* Filter bar */
+.filter-bar {
+  display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+  align-items: center;
+}
+.filter-btn {
+  padding: 5px 14px; border-radius: 20px; font-size: 11px;
+  font-weight: 600; cursor: pointer; border: 1px solid transparent;
+  transition: all .15s; background: rgba(255,255,255,0.05);
+  color: var(--asl-grey);
+}
+.filter-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--asl-white); }
+.filter-btn.active { background: rgba(232,160,32,0.15); border-color: var(--asl-accent); color: var(--asl-accent); }
+.filter-search {
+  padding: 5px 12px; background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+  color: var(--asl-white); font-size: 12px; width: 200px;
+}
+.filter-search:focus { outline: none; border-color: var(--asl-accent); }
+
+/* Historial */
+.hist-card {
+  background: var(--asl-navy); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px; margin-bottom: 12px; overflow: hidden;
+}
+.hist-header {
+  padding: 12px 16px; background: rgba(255,255,255,0.03);
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.hist-body { padding: 16px; display: none; }
+.hist-body.open { display: block; }
+.hist-field { margin-bottom: 10px; }
+.hist-field label {
+  font-size: 10px; color: var(--asl-grey); letter-spacing: 1px;
+  text-transform: uppercase; display: block; margin-bottom: 3px;
+}
+.hist-field .val { font-size: 12px; line-height: 1.6; }
+.hist-manual {
+  background: rgba(30,77,140,.2); border: 1px solid rgba(30,77,140,.4);
+  border-radius: 6px; padding: 10px 14px; margin-top: 8px;
+}
+.hist-manual-title {
+  font-size: 10px; color: var(--asl-accent); letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid { grid-template-columns: 1fr 1fr; }
+  .dash-card.notes { grid-column: span 2; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: span 1; }
+}
+@media (max-width: 600px) {
+  :root { --sidebar-w: 48px; }
+  #sidebar { width: 48px; overflow: hidden; }
+  .nav-item { padding: 13px 0; justify-content: center; }
+  .nav-item span.nav-label { display: none; }
+  .nav-icon { font-size: 18px; width: auto; }
+  .nav-separator { margin: 6px 8px; }
+  #content { padding: 12px; }
+  .dashboard-grid { grid-template-columns: 1fr; gap: 12px; }
+  .dash-card.notes { grid-column: span 1; }
+  .module-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .module-title { font-size: 15px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: span 1; }
+  .modal-box { padding: 18px; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .data-table th, .data-table td { padding: 8px 8px; font-size: 11px; }
+  .topbar-title { display: none; }
+  .topbar-time { display: none; }
+  #topbar { padding: 0 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-bg-stripe"></div>
+  <div class="login-box">
+    <div class="login-logo">
+      <svg class="logo-svg" viewBox="0 0 200 70" xmlns="http://www.w3.org/2000/svg">
+        <!-- ASL Logo -->
+        <rect x="0" y="0" width="200" height="70" fill="transparent"/>
+        <!-- Orange chevron -->
+        <polygon points="5,35 30,10 40,10 15,35 40,60 30,60" fill="#f26522"/>
+        <polygon points="18,35 40,14 48,14 26,35 48,56 40,56" fill="#e8a020" opacity=".7"/>
+        <!-- ASL text -->
+        <text x="58" y="38" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" fill="#f0f4fa" letter-spacing="2">ASL</text>
+        <!-- Aviation Belgium -->
+        <text x="58" y="54" font-family="'Helvetica Neue',Arial,sans-serif" font-size="9" fill="#8a9bb5" letter-spacing="1.5">AVIATION BELGIUM</text>
+        <!-- accent line -->
+        <rect x="58" y="42" width="120" height="1.5" fill="#e8a020" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="login-subtitle">Technical Support Platform</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="inp-user" placeholder="Enter username" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="inp-pass" placeholder="Enter password">
+    </div>
+    <button class="login-btn" id="login-btn">SIGN IN</button>
+    <div class="login-error" id="login-error">Invalid credentials. Please try again.</div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <!-- Topbar -->
+  <div id="topbar">
+    <div class="topbar-logo">
+      <svg viewBox="0 0 80 28" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="2,14 12,4 16,4 6,14 16,24 12,24" fill="#f26522"/>
+        <polygon points="7,14 16,5.5 19,5.5 10,14 19,22.5 16,22.5" fill="#e8a020" opacity=".7"/>
+        <text x="22" y="18" font-family="'Helvetica Neue',Arial" font-size="14" font-weight="900" fill="#f0f4fa" letter-spacing="1">ASL</text>
+      </svg>
+    </div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-title">Technical Support · ATR 72-600</div>
+    <div class="topbar-right">
+      <div class="topbar-time" id="clock"></div>
+      <div class="topbar-user">Pabmcc26</div>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main-layout">
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="nav-item active" onclick="showView('dashboard')" data-view="dashboard">
+        <span class="nav-icon">⊞</span>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="nav-separator"></div>
+      <div class="nav-item" onclick="showView('aircraft')" data-view="aircraft">
+        <span class="nav-icon">✈</span>
+        <span class="nav-label">Aircraft</span>
+      </div>
+      <div class="nav-item" onclick="showView('wo')" data-view="wo">
+        <span class="nav-icon">🔧</span>
+        <span class="nav-label">Work Order</span>
+      </div>
+      <div class="nav-item" onclick="showView('atl')" data-view="atl">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">ATL</span>
+      </div>
+      <div class="nav-item" onclick="showView('hil')" data-view="hil">
+        <span class="nav-icon">⏱</span>
+        <span class="nav-label">HIL</span>
+      </div>
+      <div class="nav-item" onclick="showView('historial')" data-view="historial">
+        <span class="nav-icon">📁</span>
+        <span class="nav-label">Historial</span>
+      </div>
+      <div class="nav-separator"></div>
+      <div class="nav-item" onclick="showView('contacts')" data-view="contacts">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Contactos</span>
+      </div>
+      <div class="nav-separator"></div>
+      <div class="nav-item" onclick="showView('scheduler')" data-view="scheduler">
+        <span class="nav-icon">🔔</span>
+        <span class="nav-label">Scheduler</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div id="content"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ MODAL ══ -->
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeModalOut(event)">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const SIGN = "MccPab26";
+const today = () => new Date().toISOString().split('T')[0];
+
+// helper: date + N days
+function addDays(d, n) {
+  const dt = new Date(d); dt.setDate(dt.getDate() + n);
+  return dt.toISOString().split('T')[0];
+}
+const T = today();
+
+let db = {
+  aircraft: [
+    { id:1, registration:'EI-HAG', msn:'1761', aircraft_type:'ATR 72-600F (ATR 72-212A)', operator:'ASL Aviation Belgium', status:'Active', total_hours:'4218', total_cycles:'3102' },
+    { id:2, registration:'EI-HAB', msn:'1732', aircraft_type:'ATR 72-600F (ATR 72-212A)', operator:'ASL Aviation Belgium', status:'Active', total_hours:'3976', total_cycles:'2891' },
+    { id:3, registration:'EI-GUO', msn:'1722', aircraft_type:'ATR 72-600F (ATR 72-212A)', operator:'ASL Aviation Belgium', status:'Active', total_hours:'3741', total_cycles:'2654' },
+  ],
+  wo: [
+    { id:1, wo_number:'483921', ata:'32-40', title:'NLG Door Actuator – Wear Check', defect:'NLG door actuator rod end showing excessive wear, play detected during functional test.', corrective_action:'Removed actuator assembly per AMM 32-40-15. Inspected rod end: wear exceeded serviceable limit (>0.5 mm play). Replaced with P/N ATR32-40-15A s/n 04817. Functional test satisfactory. Torque applied per table.', engineer:'P. Slomas', signature:'MccPab26', wp_reference:'WP-ATR-0032-004', aircraft_reg:'EI-HAG', created_at:'2024-09-14', closed_at:'2024-09-15', status:'closed' },
+    { id:2, wo_number:'762054', ata:'28-20', title:'Fuel Quantity Indication – LH Wing', defect:'LH wing fuel quantity reading inconsistent, oscillating ±80 kg during level flight.', corrective_action:'Checked fuel probe wiring per AMM 28-20-10. Found connector J1 at rib station 6 corroded. Cleaned with MIL-C-81302 solvent. Connector re-seated and safety-wired. BITE test confirmed: no fault codes. Ground test satisfactory.', engineer:'P. Slomas', signature:'MccPab26', wp_reference:'WP-ATR-0028-002', aircraft_reg:'EI-HAB', created_at:'2024-09-20', closed_at:'2024-09-21', status:'closed' },
+    { id:3, wo_number:'319047', ata:'21-26', title:'Avionics Bay Cooling Fan Replacement', defect:'Avionics bay cooling fan #2 (P/N 21-26-08) inoperative – seized bearing.', corrective_action:'Removed fan unit per AMM 21-26-08 Rev 12. Installed new fan P/N 21-26-08A s/n 00349. Electrical connections verified per SID 21.048. Operational test performed: airflow measured 120 CFM (min 100 CFM per limits). BITE clear.', engineer:'P. Slomas', signature:'MccPab26', wp_reference:'WP-ATR-0021-008', aircraft_reg:'EI-GUO', created_at:'2024-10-02', closed_at:'2024-10-02', status:'closed' },
+    { id:4, wo_number:'581736', ata:'34-11', title:'ILS Localizer – VOR/LOC Discrepancy', defect:'Crew reported LOC needle off-centre by 2 dots compared to captain side during ILS approach BRU RWY25L.', corrective_action:'Tested ILS per AMM 34-11-10. FO side signal cable J34-11-B2 found micro-fractured at connector. Replaced RG-400 coax segment (1.2m). Re-tested: CRS error <0.1 dot. Avionics release per CAME 34-BITE-04.', engineer:'P. Slomas', signature:'MccPab26', wp_reference:'WP-ATR-0034-011', aircraft_reg:'EI-HAG', created_at:'2024-10-08', closed_at:'2024-10-09', status:'closed' },
+    { id:5, wo_number:'204813', ata:'24-21', title:'IDG #1 Oil Level Low', defect:'ECAM advisory IDG 1 OIL LO on departure BRU. Oil level confirmed below MIN mark on sight glass.', corrective_action:'Serviced IDG #1 with MIL-PRF-7808L oil per AMM 24-21-12. Added 0.4 qt to bring level to MAX mark. Checked for leaks: none found. Engine run performed, IDG advisory clear after 3 min. CRS issued.', engineer:'P. Slomas', signature:'MccPab26', wp_reference:'WP-ATR-0024-021', aircraft_reg:'EI-HAB', created_at:'2024-10-15', closed_at:'2024-10-15', status:'closed' },
+    { id:6, wo_number:'937462', ata:'27-21', title:'Aileron Control Cable – Tension Adjustment', defect:'Aileron rigging check during C-Check revealed LH aileron cable tension at 43 lb (limit 55–75 lb).', corrective_action:'Re-rigged aileron control system per AMM 27-21-03. Cable tension adjusted to 65 lb (within 55–75 lb limit). Turnbuckle lock-wired per standard. Full travel check: UP 25° / DN 15° – within tolerance. Duplicate inspection completed.', engineer:'P. Slomas', signature:'MccPab26', wp_reference:'WP-ATR-0027-003', aircraft_reg:'EI-GUO', created_at:'2024-10-22', closed_at:'2024-10-23', status:'closed' },
+    { id:7, wo_number:'645290', ata:'52-10', title:'FWD Cargo Door – Seal Replacement', defect:'Air leak detected at FWD cargo door upper seal during pressurisation check. Leak rate 2.4 lb/min (limit <1.0 lb/min).', corrective_action:'Removed and replaced door perimeter seal P/N ATR52-10-SEA-02 per AMM 52-10-07. Door adjusted: clearance gap 2 mm uniform (limit 1.5–3 mm). Pressurisation check repeated: leak rate 0.3 lb/min – within limits.', engineer:'P. Slomas', signature:'MccPab26', wp_reference:'WP-ATR-0052-010', aircraft_reg:'EI-HAG', created_at:'2024-11-03', closed_at:'2024-11-03', status:'closed' },
+    { id:8, wo_number:'158374', ata:'79-21', title:'Oil Cooler – Engine #2 Blockage', defect:'ENG 2 OIL TEMP ECAM advisory during climb. Oil temp reached 155°C (max 145°C normal ops).', corrective_action:'Removed oil cooler P/N ATR79-21-OC per AMM 79-21-10. Flushed cooler with Turco 4338-L solvent. Core partially blocked (estimated 30%). Blockage cleared. Reinstalled with new gaskets. Post-engine run: oil temp 118°C at cruise power – within normal range.', engineer:'P. Slomas', signature:'MccPab26', wp_reference:'WP-ATR-0079-021', aircraft_reg:'EI-HAB', created_at:'2024-11-10', closed_at:'2024-11-11', status:'closed' },
+  ],
+  atl: [
+    { id:1, atl_number:'ATL-881203', pilot_report:'Landing gear warning light intermittent during transit BRU-CDG. GEAR UNSAFE indication 3 sec after gear up selection, then normal.', certifying_action:'Inspected micro-switch on LH MLG uplatch per AMM 32-60-05. Found micro-switch gap 0.9 mm (limit 0.3–0.7 mm). Adjusted to 0.5 mm. Functional test: 5 cycles, no fault. BITE clear.', crs:'CRS issued: Work carried out in accordance with AMM 32-60-05 Rev 14. Aircraft released to service by authorised certifying staff. AME Lic B1.1 – EASA.145.0419.', aircraft_reg:'EI-HAG', created_at:'2024-11-20', status:'closed' },
+    { id:2, atl_number:'ATL-334751', pilot_report:'ANTI SKID FAULT ECAM message during landing roll BRU. Braking felt normal.', certifying_action:'Tested anti-skid system per TSM 32-43-00. BITE identified fault on WHL 3 speed transducer. Replaced transducer P/N 32-43-T3 per AMM 32-43-04. System test: all channels normal.', crs:'CRS issued: Work carried out per AMM 32-43-04 Rev 9. Aircraft released to service. AME Lic B1.1 – EASA.145.0419.', aircraft_reg:'EI-HAB', created_at:'2024-11-22', status:'closed' },
+    { id:3, atl_number:'ATL-509617', pilot_report:'Slight vibration felt in rudder pedals above 200 KIAS during climb.', certifying_action:'Inspected rudder mechanical system per AMM 27-31-00. Found aft rudder pushrod rod-end bearing worn (axial play 1.1 mm, limit 0.8 mm). Replaced bearing per AMM 27-31-12. Rigging check satisfactory.', crs:'CRS issued: Work per AMM 27-31-12 Rev 7. Aircraft released. AME Lic B1.1 – EASA.145.0419.', aircraft_reg:'EI-GUO', created_at:'2024-11-25', status:'open' },
+  ],
+  hil: [
+    { id:1, hil_number:'HIL-771042', ata:'32-42', title:'NLG Steering Shimmy Damper – Leaking', description:'NLG shimmy damper found with hydraulic fluid seeping from lower gland seal during pre-flight inspection.', aircraft_reg:'EI-HAG', atl_wo_ref:'ATL-881203 / WO-483921', reason:'Leak rate within acceptable limit for continued operation per MEL 32-42-1.', mel_cat:'B', mel_ref:'32-42-1-A', mel_ata:'32', mel_item:'42', mel_sub:'1', mel_point:'A', interval_fh:'0', interval_dy:'3', deadline: addDays(T, 3), signature:'MccPab26', reply_solution:'Pending replacement at next maintenance opportunity – BRU base.', reply_station:'BRU', reply_date:'', reply_sig:'' },
+    { id:2, hil_number:'HIL-290583', ata:'24-22', title:'AC Bus 2 – Tie Relay Intermittent', description:'Intermittent ELEC AC BUS 2 FAULT ECAM advisory. Fault not reproducible on ground. Suspected relay contacts.', aircraft_reg:'EI-HAB', atl_wo_ref:'ATL-334751', reason:'System fully functional. Per MEL 24-22-1, deferred pending replacement.', mel_cat:'C', mel_ref:'24-22-1-B', mel_ata:'24', mel_item:'22', mel_sub:'1', mel_point:'B', interval_fh:'0', interval_dy:'5', deadline: addDays(T, 5), signature:'MccPab26', reply_solution:'Part on order, P/N 24-22-REL-07. ETA 3 days.', reply_station:'BRU', reply_date:'', reply_sig:'' },
+  ],
+  historial: [
+    // EI-HAG (5)
+    { id:1, aircraft_reg:'EI-HAG', date:'2024-07-03', ata:'71-00', title:'Engine #1 Compressor Stall – Chip Detect', defect:'Engine #1 chip detect light illuminated during climb. P2.5 sensor showed EGT spike to 825°C (limit 810°C).', corrective_action:'Engine #1 borescope per EMM 72-30-00. Found two compressor stage 4 blades with minor erosion, within serviceable limits. Cleaned P2.5 sensor port. Drained oil, inspected filter: metallic particles found (ferrous), count 12 per 100 cc (limit 15). Engine test cell run performed. Parameters: EGT 780°C, N1 100.1%, Ng 101.3% – all within limits. CRS issued.', manual_ref:'EMM 72-30-00 Rev 22 / AMM 79-00-10 Rev 8 / PWEC SB 72-0045 Rev 4', release:'CRS issued. Engine cleared for return to service per EMM 72-30-00. EASA Part-66 B1.1 certifying staff. EASA.145.0419.', status:'closed' },
+    { id:2, aircraft_reg:'EI-HAG', date:'2024-05-11', ata:'27-11', title:'Elevator Control System – Runaway Trim', defect:'Intermittent "ELEV TRIM RUNAWAY" ECAM. Trim moved uncommanded during cruise FL230.', corrective_action:'Tested pitch trim control system per AMM 27-41-00. Pitch trim module (PTM) self-test revealed fault code F-04: dual channel comparison error. Replaced PTM P/N 27-41-PTM-01 s/n 1182 per AMM 27-41-12. Carried out ground functional test: all 4 modes normal. Carried out flight test. No recurrence.', manual_ref:'AMM 27-41-00 Rev 11 / AMM 27-41-12 Rev 9 / TSM 27-41 FAULT F-04', release:'CRS issued per AMM 27-41-12. Aircraft returned to service. EASA.145.0419.', status:'closed' },
+    { id:3, aircraft_reg:'EI-HAG', date:'2024-03-18', ata:'29-10', title:'Hydraulic System Leak – Blue Circuit', defect:'Blue hydraulic system pressure loss: 140 bar to 0 in 12 min after engine start.', corrective_action:'Traced leak to HP filter assembly housing crack (fatigue) per AMM 29-10-08. Replaced filter housing P/N HYD-2910-H with new P/N HYD-2910-H Rev B. System recharged to 175 bar with Aeroshell 41. Full system functional test: all actuators, NLG, brakes – satisfactory. No leaks after 30 min ground run.', manual_ref:'AMM 29-10-08 Rev 14 / CMM 29-10-12 Rev 6 / SB ATR29-033', release:'CRS issued per AMM 29-10-08 Rev 14. EASA.145.0419.', status:'closed' },
+    { id:4, aircraft_reg:'EI-HAG', date:'2024-01-29', ata:'56-11', title:'Windshield LH – Crack (FOD)', defect:'Crew reported crack in LH windshield inner ply, approx 38 mm length, star pattern. FOD impact suspected.', corrective_action:'Assessed crack per SSM 56-11-01. Inner ply crack exceeds dispatching limit (max 30 mm linear). Windshield removed and replaced P/N ATR56-11-WS-LH per AMM 56-11-04. Installed using room-temperature cure sealant PR-1826. Cure time 24h. Structural check and leak test satisfactory.', manual_ref:'AMM 56-11-04 Rev 6 / SSM 56-11-01 Rev 5 / PR-1826 Mixing Instructions', release:'CRS issued per AMM 56-11-04. Aircraft returned to service. EASA.145.0419.', status:'closed' },
+    { id:5, aircraft_reg:'EI-HAG', date:'2023-11-07', ata:'49-11', title:'APU Bleed Valve – Stuck Closed', defect:'APU BLEED NOT AVAIL ECAM on ground power-up. APU started normally, bleed not available for air conditioning.', corrective_action:'Tested APU bleed system per AMM 49-11-12. Bleed valve actuator found seized (mechanical jam, thread seized). Removed actuator P/N APU4911-ACT per AMM 49-11-14. Replaced with s/n 00723. APU pneumatic test: bleed pressure 35 PSI (min 30 PSI) – satisfactory. ECAM advisory clear.', manual_ref:'AMM 49-11-12 Rev 10 / AMM 49-11-14 Rev 10 / APU CMM 49-11-00 Rev 18', release:'CRS issued per AMM 49-11-14. Aircraft serviceable. EASA.145.0419.', status:'closed' },
+    // EI-HAB (5)
+    { id:6, aircraft_reg:'EI-HAB', date:'2024-08-15', ata:'32-51', title:'MLG RH – Oleo Strut Low Pressure', defect:'RH MLG oleo fully bottomed during towing. Pressure found 0 PSI (nominal 900 PSI per AMM).', corrective_action:'Serviced RH MLG strut per AMM 32-51-04. Found Schrader valve core cracked. Replaced valve core. Dry nitrogen charged to 900 PSI per servicing chart (460 kg aircraft weight). Extension check: 58 mm (min 50 mm per AMM). Oil level checked and replenished to upper sight glass (added 0.15 L MIL-H-5606).', manual_ref:'AMM 32-51-04 Rev 17 / AMM 32-51-00 Rev 17 (Servicing Chart)', release:'CRS issued per AMM 32-51-04. Aircraft returned to service. EASA.145.0419.', status:'closed' },
+    { id:7, aircraft_reg:'EI-HAB', date:'2024-06-21', ata:'34-42', title:'WXR Antenna – Degraded Tilt Mechanism', defect:'Weather radar tilt servo not responding to cockpit input. Antenna stuck at 0° elevation.', corrective_action:'Tested WXR system per AMM 34-42-10. Tilt servo motor P/N 34-42-SRV tested: motor spins but no output torque (stripped internal gear). Replaced servo motor per AMM 34-42-14. Calibration performed per Rockwell Collins 880 MAINT MAN Section 6. Tilt range: -15° to +15° – satisfactory.', manual_ref:'AMM 34-42-14 Rev 9 / Rockwell Collins WXR-880 Maintenance Manual Sec 6', release:'CRS issued per AMM 34-42-14. Avionics release per CAME. EASA.145.0419.', status:'closed' },
+    { id:8, aircraft_reg:'EI-HAB', date:'2024-04-05', ata:'36-11', title:'Bleed Air Duct – Leak (Engine #2 Side)', defect:'Hot air smell in cabin. BLEED DUCT LEAK ECAM advisory on climb.', corrective_action:'Isolated bleed system per AMM 36-11-00. Found bleed air flexible duct segment cracked at engine #2 outlet per AMM 36-11-08 inspection procedure. Replaced flexible duct segment P/N BLD-3611-F2 s/n 0387 per AMM 36-11-12. Duct leak check at 50 PSI: no leak. Engine run: ECAM clear.', manual_ref:'AMM 36-11-08 Rev 12 / AMM 36-11-12 Rev 12 / SB ATR36-028', release:'CRS issued per AMM 36-11-12. Aircraft serviceable. EASA.145.0419.', status:'closed' },
+    { id:9, aircraft_reg:'EI-HAB', date:'2024-02-13', ata:'31-61', title:'DFDR – Download Error / Failure Flag', defect:'DFDR FAIL message on ECAM. OPS reported download failed. Required for audit by CAA.', corrective_action:'Tested DFDR per AMM 31-61-10. BITE: read/write head error, P/N DFD-3161-H. Removed unit per AMM 31-61-12. Installed loaner unit s/n L-0041. Full function test: 6h recording then playback – all parameters recorded correctly. Original unit sent to L3 Technologies for repair.', manual_ref:'AMM 31-61-10 Rev 8 / AMM 31-61-12 Rev 8 / L3 CVDR CMM 31-10-XX', release:'CRS issued per AMM 31-61-12. Aircraft DFDR operative. EASA.145.0419.', status:'closed' },
+    { id:10, aircraft_reg:'EI-HAB', date:'2023-12-01', ata:'30-21', title:'Wing De-Ice Boots – Partial Failure LH', defect:'LH wing inner de-ice boot not inflating. Ice protection INOP for inner section.', corrective_action:'Tested de-ice system per AMM 30-21-00. Pneumatic distributor valve P/N 30-21-DV failed to open for inner boot circuit. Replaced valve per AMM 30-21-08. System test: sequencing 3→1→2 normal. Boot inflation: 18 PSI at all sections – within limits. ECAM clear.', manual_ref:'AMM 30-21-00 Rev 15 / AMM 30-21-08 Rev 15 / SIL ATR30-005', release:'CRS issued per AMM 30-21-08. Aircraft returned to service. EASA.145.0419.', status:'closed' },
+    // EI-GUO (5)
+    { id:11, aircraft_reg:'EI-GUO', date:'2024-09-01', ata:'32-33', title:'Brake Assembly – MLG LH Worn Beyond Limits', defect:'LH MLG brake wear indicators all flush (0 mm) per pre-flight inspection.', corrective_action:'Replaced LH MLG brake assembly P/N 32-33-BRK-L (Dunlop) per AMM 32-33-08. Torque bolts to 280 Nm per table. Hydraulic bleed performed per AMM 29-30-04. Brake test: 4 full stops from 40 KIAS towing speed – performance satisfactory. Wear indicator: 12 mm visible – within new limits.', manual_ref:'AMM 32-33-08 Rev 14 / AMM 29-30-04 Rev 12 / Dunlop CMM 32-33-01 Rev 9', release:'CRS issued per AMM 32-33-08. Aircraft brakes serviceable. EASA.145.0419.', status:'closed' },
+    { id:12, aircraft_reg:'EI-GUO', date:'2024-07-19', ata:'23-72', title:'CVR – Erroneous Bulk Erase', defect:'CVR hot mic inadvertently erased by crew. Required re-check per operator procedure.', corrective_action:'Tested CVR per AMM 23-72-10. BITE confirmed recording system fully functional. Conducted 30-min recording test per CAAIP L5/1. Playback: all 4 channels clear, no dropout. Completed CVR serviceable record per company SOP CVR-OPS-04.', manual_ref:'AMM 23-72-10 Rev 7 / CAAIP L5/1 CVR Test Procedure / SOP CVR-OPS-04', release:'CRS issued per AMM 23-72-10. CVR serviceable. EASA.145.0419.', status:'closed' },
+    { id:13, aircraft_reg:'EI-GUO', date:'2024-05-28', ata:'28-42', title:'Fuel Pump #2 (LH Wing) – Failure', defect:'ECAM FUEL LH PUMP 2 FAULT on ground. Fuel quantity decreasing abnormally, pump circuit breaker tripped.', corrective_action:'Defueled LH wing to 200 kg per AMM 28-00-00 (defuelling procedure). Removed boost pump #2 per AMM 28-42-08. Motor armature found failed (short circuit). Installed new pump P/N 28-42-PMP-02 s/n 00194. Functional test: pump pressure 45 PSI (min 40 PSI). CB reset, no trip on test run.', manual_ref:'AMM 28-42-08 Rev 11 / AMM 28-00-00 Rev 11 (defuelling) / CMM 28-42-PMP Rev 8', release:'CRS issued per AMM 28-42-08. Aircraft fuel system serviceable. EASA.145.0419.', status:'closed' },
+    { id:14, aircraft_reg:'EI-GUO', date:'2024-03-10', ata:'35-11', title:'Oxygen System – Crew Mask Regulator Fail', defect:'Crew reported captain O2 mask regulator "100%" mode inoperative. Emergency O2 pressure 1650 PSI (min 1800 PSI).', corrective_action:'Replaced captain mask regulator assembly P/N 35-11-REG per AMM 35-11-10. O2 system serviced: recharged to 1850 PSI using Mil Spec O2 per AMM 35-11-00. Functional test: normal and 100% modes – both operative. Diluter demand tested: O2 flow >4 L/min satisfactory.', manual_ref:'AMM 35-11-10 Rev 8 / AMM 35-11-00 Rev 8 / SIL ATR35-003', release:'CRS issued per AMM 35-11-10. Oxygen system serviceable. EASA.145.0419.', status:'closed' },
+    { id:15, aircraft_reg:'EI-GUO', date:'2024-01-08', ata:'26-12', title:'Engine #1 Fire Detection Loop A – False Alerts', defect:'Repeated ENGINE 1 FIRE ECAM warnings during ground runs. Loop B healthy. No actual fire.', corrective_action:'Tested fire detection system per AMM 26-12-10. Loop A resistance: 1.2 MΩ (min 5 MΩ). Found sensing element chafing against fan case rib. Re-routed and re-clamped sensing element per AMM 26-12-14. Applied additional anti-chafe sleeve. Re-test: 18 MΩ – within limits. Functional test: alarm at 175°C – correct.', manual_ref:'AMM 26-12-10 Rev 13 / AMM 26-12-14 Rev 13 / SB ATR26-009', release:'CRS issued per AMM 26-12-14. Fire detection Loop A serviceable. EASA.145.0419.', status:'closed' },
+  ],
+  notes: '',
+};
+
+// Save notes to localStorage when changed
+function saveNotes() {
+  db.notes = document.getElementById('notesArea').value;
+  showToast('Notes saved', 'success');
+}
+
+// IDs
+let nextId = {wo: 9, atl: 4, hil: 3, aircraft: 4};
+function uid(type) { return nextId[type]++; }
+function randWO() { return String(Math.floor(100000 + Math.random()*899999)); }
+
+// current filter state
+let woFilter = 'all', atlFilter = 'all', hilFilter = 'all';
+let woSearch = '', atlSearch = '', hilSearch = '';
+
+// ═══════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('login-btn');
+  btn.addEventListener('click', doLogin);
+  btn.addEventListener('touchend', function(e) { e.preventDefault(); doLogin(); });
+});
+
+function doLogin() {
+  var u = document.getElementById('inp-user').value.trim();
+  var p = document.getElementById('inp-pass').value;
+  if (u === 'Pabmcc26' && p === 'Mcc26') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    startClock();
+    showView('dashboard');
+  } else {
+    var err = document.getElementById('login-error');
+    err.style.display = 'block';
+    setTimeout(function(){ err.style.display='none'; }, 3000);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
+});
+function doLogout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pass').value = '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════════════════════
+function startClock() {
+  function tick() {
+    const now = new Date(Date.now() + 3600000);
+    const d = now.toUTCString().replace(' GMT','');
+    document.getElementById('clock').textContent = d.split(' ').slice(1,5).join(' ') + ' LT+1';
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showView(view) {
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+  const content = document.getElementById('content');
+  switch(view) {
+    case 'dashboard': content.innerHTML = renderDashboard(); bindDashNotes(); break;
+    case 'aircraft':  content.innerHTML = renderAircraft(); break;
+    case 'wo':        content.innerHTML = renderWO(); break;
+    case 'atl':       content.innerHTML = renderATL(); break;
+    case 'hil':       content.innerHTML = renderHIL(); break;
+    case 'historial': content.innerHTML = renderHistorial(); break;
+    case 'scheduler': content.innerHTML = renderScheduler(); bindScheduler(); break;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════
+function openModal(html) {
+  document.getElementById('modal-box').innerHTML = html;
+  document.getElementById('modal').style.display = 'flex';
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+function closeModalOut(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+
+// ═══════════════════════════════════════════════════════════
+// SIGNATURE
+// ═══════════════════════════════════════════════════════════
+function applySig(fieldId, btnId) {
+  document.getElementById(fieldId).value = SIGN;
+  const btn = document.getElementById(btnId);
+  btn.classList.add('sig-applied');
+  btn.innerHTML = `✔ ${SIGN}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function renderDashboard() {
+  const aogAC = db.aircraft.filter(a => a.status === 'AOG');
+  const hilUrgent = db.hil.filter(h => {
+    const days = Math.ceil((new Date(h.deadline) - new Date(T)) / 86400000);
+    return days <= 5 && days >= 0;
+  });
+  const woOpen = db.wo.filter(w => w.status === 'open');
+  const atlRecent = [...db.atl].sort((a,b)=>b.id-a.id).slice(0,5);
+
+  let aogHTML = aogAC.length ? aogAC.map(a => `
+    <div class="dash-item aog-item" onclick="showView('aircraft')">
+      <div class="dash-item-reg">${a.registration}</div>
+      <div class="dash-item-title">${a.aircraft_type}</div>
+      <div class="dash-item-meta">Status: AOG</div>
+    </div>`).join('') : '<div class="empty-state">No AOG aircraft</div>';
+
+  let hilHTML = hilUrgent.length ? hilUrgent.map(h => {
+    const days = Math.ceil((new Date(h.deadline) - new Date(T)) / 86400000);
+    const cls = days <= 3 ? 'deadline-urgent' : 'deadline-warn';
+    return `<div class="dash-item hil-item" onclick="showView('hil');setTimeout(()=>openHILDetail(${h.id}),50)">
+      <div class="dash-item-reg">${h.aircraft_reg}</div>
+      <div class="dash-item-title">${h.title}</div>
+      <div class="dash-item-meta">${h.hil_number} · <span class="${cls}">${days}d remaining</span></div>
+    </div>`;}).join('') : '<div class="empty-state">No HIL items due soon</div>';
+
+  let woHTML = woOpen.length ? woOpen.map(w => `
+    <div class="dash-item wo-item" onclick="showView('wo');setTimeout(()=>openWODetail(${w.id}),50)">
+      <div class="dash-item-reg">${w.aircraft_reg}</div>
+      <div class="dash-item-title">${w.title}</div>
+      <div class="dash-item-meta">WO ${w.wo_number} · ATA ${w.ata}</div>
+    </div>`).join('') : '<div class="empty-state">No open work orders</div>';
+
+  let atlHTML = atlRecent.length ? atlRecent.map(a => `
+    <div class="dash-item atl-item" onclick="showView('atl');setTimeout(()=>openATLDetail(${a.id}),50)">
+      <div class="dash-item-reg">${a.aircraft_reg}</div>
+      <div class="dash-item-title">${a.atl_number}</div>
+      <div class="dash-item-meta">${a.created_at} · ${a.status}</div>
+    </div>`).join('') : '<div class="empty-state">No ATL entries</div>';
+
+  return `
+  <div class="module-header">
+    <div>
+      <div class="module-title">Operations Overview</div>
+      <div class="module-subtitle">${new Date().toDateString()} · ATR 72-600 Fleet</div>
+    </div>
+  </div>
+  <div class="dashboard-grid">
+    <div class="dash-card aog">
+      <div class="dash-card-header">
+        <span class="dash-card-title">AOG</span>
+        <span class="dash-badge badge-danger">${aogAC.length}</span>
+      </div>
+      ${aogHTML}
+    </div>
+    <div class="dash-card hil">
+      <div class="dash-card-header">
+        <span class="dash-card-title">HIL – Due Soon</span>
+        <span class="dash-badge badge-diff">${hilUrgent.length}</span>
+      </div>
+      ${hilHTML}
+    </div>
+    <div class="dash-card wo">
+      <div class="dash-card-header">
+        <span class="dash-card-title">Work Orders Open</span>
+        <span class="dash-badge badge-warn">${woOpen.length}</span>
+      </div>
+      ${woHTML}
+    </div>
+    <div class="dash-card atl">
+      <div class="dash-card-header">
+        <span class="dash-card-title">ATL – Recent</span>
+        <span class="dash-badge badge-blue">${atlRecent.length}</span>
+      </div>
+      ${atlHTML}
+    </div>
+    <div class="dash-card notes" style="grid-column:span 2">
+      <div class="dash-card-header">
+        <span class="dash-card-title">Shift Relay / Annotations / Queries</span>
+        <span class="dash-badge badge-success">Notes</span>
+      </div>
+      <textarea class="notes-area" id="notesArea" placeholder="Enter shift relay notes, queries or annotations here...">${db.notes}</textarea>
+      <button class="btn-save-note" onclick="saveNotes()">💾 Save Notes</button>
+    </div>
+  </div>`;
+}
+
+function bindDashNotes() {
+  // notes already bound via onclick
+}
+
+// ═══════════════════════════════════════════════════════════
+// AIRCRAFT
+// ═══════════════════════════════════════════════════════════
+function renderAircraft() {
+  const rows = db.aircraft.map(a => `
+    <tr>
+      <td><span class="reg-tag">${a.registration}</span></td>
+      <td>${a.msn}</td>
+      <td>${a.aircraft_type}</td>
+      <td>${a.operator}</td>
+      <td><span class="status-tag ${a.status==='AOG'?'s-aog':a.status==='Active'?'s-open':'s-closed'}">${a.status}</span></td>
+      <td>${a.total_hours} h</td>
+      <td>${a.total_cycles} cy</td>
+      <td style="white-space:nowrap">
+        <button class="btn-sm btn-edit" onclick="editAircraft(${a.id})">Edit</button>
+      </td>
+    </tr>`).join('');
+  return `
+  <div class="module-header">
+    <div><div class="module-title">Aircraft Registry</div><div class="module-subtitle">ATR 72-600 Fleet · ASL Aviation Belgium</div></div>
+    <button class="btn-primary" onclick="addAircraft()">+ Add Aircraft</button>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="data-table">
+    <thead><tr>
+      <th>Registration</th><th>MSN</th><th>Type</th><th>Operator</th>
+      <th>Status</th><th>Total Hours</th><th>Total Cycles</th><th>Actions</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function addAircraft() { openAircraftForm(); }
+function editAircraft(id) { openAircraftForm(db.aircraft.find(a=>a.id===id)); }
+
+function openAircraftForm(a=null) {
+  const isEdit = !!a;
+  const f = a || {id:null,registration:'',msn:'',aircraft_type:'ATR 72-600F (ATR 72-212A)',operator:'ASL Aviation Belgium',status:'Active',total_hours:'',total_cycles:''};
+  openModal(`
+  <div class="modal-title">${isEdit?'Edit Aircraft':'Add Aircraft'}<button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="form-grid">
+    <div class="form-group"><label>Registration</label><input id="f-reg" value="${f.registration}"></div>
+    <div class="form-group"><label>MSN</label><input id="f-msn" value="${f.msn}"></div>
+    <div class="form-group full"><label>Aircraft Type</label><input id="f-type" value="${f.aircraft_type}"></div>
+    <div class="form-group"><label>Operator</label><input id="f-op" value="${f.operator}"></div>
+    <div class="form-group"><label>Status</label>
+      <select id="f-sta">
+        ${['Active','AOG','In Maintenance','Stored'].map(s=>`<option ${f.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Total Hours</label><input id="f-th" value="${f.total_hours}"></div>
+    <div class="form-group"><label>Total Cycles</label><input id="f-tc" value="${f.total_cycles}"></div>
+  </div>
+  <div class="form-actions">
+    ${isEdit?`<button class="btn-sm btn-del" onclick="delAircraft(${f.id})">Delete</button>`:''}
+    <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    <button class="btn-primary" onclick="saveAircraft(${f.id||'null'})">Save</button>
+  </div>`);
+}
+
+function saveAircraft(id) {
+  const data = {
+    registration: document.getElementById('f-reg').value,
+    msn: document.getElementById('f-msn').value,
+    aircraft_type: document.getElementById('f-type').value,
+    operator: document.getElementById('f-op').value,
+    status: document.getElementById('f-sta').value,
+    total_hours: document.getElementById('f-th').value,
+    total_cycles: document.getElementById('f-tc').value,
+  };
+  if (id) { Object.assign(db.aircraft.find(a=>a.id===id), data); }
+  else { db.aircraft.push({id:uid('aircraft'), ...data}); }
+  closeModal(); showView('aircraft'); showToast('Aircraft saved', 'success');
+}
+function delAircraft(id) {
+  if(confirm('Delete aircraft?')) { db.aircraft = db.aircraft.filter(a=>a.id!==id); closeModal(); showView('aircraft'); showToast('Aircraft deleted'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// WORK ORDERS
+// ═══════════════════════════════════════════════════════════
+function renderWO() {
+  const filtered = db.wo.filter(w => {
+    const matchFilter = woFilter==='all' || w.status===woFilter;
+    const matchSearch = !woSearch || w.wo_number.includes(woSearch) || w.title.toLowerCase().includes(woSearch) || w.aircraft_reg.includes(woSearch);
+    return matchFilter && matchSearch;
+  });
+  const rows = filtered.map(w => `
+    <tr onclick="openWODetail(${w.id})" style="cursor:pointer">
+      <td><b>${w.wo_number}</b></td>
+      <td>${w.ata}</td>
+      <td><span class="reg-tag">${w.aircraft_reg}</span></td>
+      <td>${w.title}</td>
+      <td>${w.engineer}</td>
+      <td>${w.created_at}</td>
+      <td><span class="status-tag s-${w.status}">${w.status}</span></td>
+      <td style="white-space:nowrap" onclick="event.stopPropagation()">
+        <button class="btn-sm btn-edit" onclick="editWO(${w.id})">Edit</button>
+        <button class="btn-sm btn-del" onclick="delWO(${w.id})">Del</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--asl-grey);padding:20px">No records found</td></tr>';
+  return `
+  <div class="module-header">
+    <div><div class="module-title">Work Orders</div><div class="module-subtitle">${db.wo.length} total</div></div>
+    <button class="btn-primary" onclick="addWO()">+ New WO</button>
+  </div>
+  <div class="filter-bar">
+    ${['all','open','closed','deferred','aog'].map(f=>`<button class="filter-btn ${woFilter===f?'active':''}" onclick="woFilter='${f}';showView('wo')">${f.toUpperCase()}</button>`).join('')}
+    <input class="filter-search" placeholder="Search WO, title, reg..." oninput="woSearch=this.value.toLowerCase();showView('wo')" value="${woSearch}">
+  </div>
+  <div style="overflow-x:auto">
+  <table class="data-table">
+    <thead><tr><th>WO Number</th><th>ATA</th><th>A/C Reg</th><th>Title</th><th>Engineer</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function openWODetail(id) {
+  const w = db.wo.find(x=>x.id===id); if(!w) return;
+  openModal(`
+  <div class="modal-title">Work Order ${w.wo_number} <button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="detail-section">
+    <div class="detail-section-title">Header</div>
+    <div class="detail-grid">
+      <div class="detail-item"><label>WO Number</label><div class="val">${w.wo_number}</div></div>
+      <div class="detail-item"><label>A/C Registration</label><div class="val"><span class="reg-tag">${w.aircraft_reg}</span></div></div>
+      <div class="detail-item"><label>ATA</label><div class="val">${w.ata}</div></div>
+      <div class="detail-item"><label>WP Reference</label><div class="val">${w.wp_reference}</div></div>
+      <div class="detail-item"><label>Status</label><div class="val"><span class="status-tag s-${w.status}">${w.status}</span></div></div>
+      <div class="detail-item"><label>Created</label><div class="val">${w.created_at}</div></div>
+      <div class="detail-item"><label>Closed</label><div class="val">${w.closed_at||'—'}</div></div>
+    </div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">Defect & Corrective Action</div>
+    <div class="detail-item" style="margin-bottom:10px"><label>Title</label><div class="val">${w.title}</div></div>
+    <div class="detail-item" style="margin-bottom:10px"><label>Defect</label><div class="val">${w.defect}</div></div>
+    <div class="detail-item"><label>Corrective Action</label><div class="val">${w.corrective_action}</div></div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">Release</div>
+    <div class="detail-grid">
+      <div class="detail-item"><label>Engineer</label><div class="val">${w.engineer}</div></div>
+      <div class="detail-item"><label>Signature</label><div class="val" style="color:var(--asl-success);font-weight:700">${w.signature||'—'}</div></div>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn-cancel" onclick="closeModal()">Close</button>
+    <button class="btn-primary" onclick="closeModal();editWO(${w.id})">Edit</button>
+  </div>`);
+}
+
+function addWO() { openWOForm(); }
+function editWO(id) { openWOForm(db.wo.find(w=>w.id===id)); }
+
+function openWOForm(w=null) {
+  const isEdit = !!w;
+  const f = w || {id:null,wo_number:randWO(),ata:'',title:'',defect:'',corrective_action:'',engineer:'P. Slomas',signature:'',wp_reference:'',aircraft_reg:'EI-HAG',created_at:today(),closed_at:'',status:'open'};
+  const regs = db.aircraft.map(a=>a.registration);
+  openModal(`
+  <div class="modal-title">${isEdit?'Edit WO '+f.wo_number:'New Work Order'}<button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="form-grid">
+    <div class="form-group"><label>WO Number</label><input id="fw-num" value="${f.wo_number}"></div>
+    <div class="form-group"><label>A/C Registration</label>
+      <select id="fw-reg">${regs.map(r=>`<option ${f.aircraft_reg===r?'selected':''}>${r}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>ATA</label><input id="fw-ata" value="${f.ata}" placeholder="xx-xx"></div>
+    <div class="form-group"><label>WP Reference</label><input id="fw-wp" value="${f.wp_reference}"></div>
+    <div class="form-group full"><label>Title</label><input id="fw-title" value="${f.title}"></div>
+    <div class="form-group full"><label>Defect</label><textarea id="fw-def">${f.defect}</textarea></div>
+    <div class="form-group full"><label>Corrective Action</label><textarea id="fw-ca" style="min-height:100px">${f.corrective_action}</textarea></div>
+    <div class="form-group"><label>Engineer</label><input id="fw-eng" value="${f.engineer}"></div>
+    <div class="form-group"><label>Status</label>
+      <select id="fw-sta">${['open','closed','deferred','aog'].map(s=>`<option ${f.status===s?'selected':''}>${s}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>Created</label><input type="date" id="fw-cr" value="${f.created_at}"></div>
+    <div class="form-group"><label>Closed</label><input type="date" id="fw-cl" value="${f.closed_at}"></div>
+    <div class="form-group full">
+      <label>Signature</label>
+      <button class="sig-btn ${f.signature?'sig-applied':''}" id="fw-sigbtn" onclick="applySig('fw-sig','fw-sigbtn')" type="button">
+        ${f.signature ? '✔ '+f.signature : '✎ Apply Signature MccPab26'}
+      </button>
+      <input type="hidden" id="fw-sig" value="${f.signature}">
+    </div>
+  </div>
+  <div class="form-actions">
+    ${isEdit?`<button class="btn-sm btn-del" onclick="delWO(${f.id})">Delete</button>`:''}
+    <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    <button class="btn-primary" onclick="saveWO(${f.id||'null'})">Save</button>
+  </div>`);
+}
+
+function saveWO(id) {
+  const data = {
+    wo_number: document.getElementById('fw-num').value,
+    aircraft_reg: document.getElementById('fw-reg').value,
+    ata: document.getElementById('fw-ata').value,
+    wp_reference: document.getElementById('fw-wp').value,
+    title: document.getElementById('fw-title').value,
+    defect: document.getElementById('fw-def').value,
+    corrective_action: document.getElementById('fw-ca').value,
+    engineer: document.getElementById('fw-eng').value,
+    status: document.getElementById('fw-sta').value,
+    created_at: document.getElementById('fw-cr').value,
+    closed_at: document.getElementById('fw-cl').value,
+    signature: document.getElementById('fw-sig').value,
+  };
+  if (id) { Object.assign(db.wo.find(w=>w.id===id), data); }
+  else { db.wo.push({id:uid('wo'), ...data}); }
+  closeModal(); showView('wo'); showToast('Work Order saved', 'success');
+}
+function delWO(id) {
+  if(confirm('Delete this Work Order?')) { db.wo = db.wo.filter(w=>w.id!==id); closeModal(); showView('wo'); showToast('WO deleted'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ATL
+// ═══════════════════════════════════════════════════════════
+function renderATL() {
+  const filtered = db.atl.filter(a => {
+    const matchFilter = atlFilter==='all' || a.status===atlFilter;
+    const matchSearch = !atlSearch || a.atl_number.includes(atlSearch) || a.aircraft_reg.includes(atlSearch) || a.pilot_report.toLowerCase().includes(atlSearch);
+    return matchFilter && matchSearch;
+  });
+  const rows = filtered.map(a => `
+    <tr onclick="openATLDetail(${a.id})" style="cursor:pointer">
+      <td><b>${a.atl_number}</b></td>
+      <td><span class="reg-tag">${a.aircraft_reg}</span></td>
+      <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.pilot_report}</td>
+      <td>${a.created_at}</td>
+      <td><span class="status-tag s-${a.status}">${a.status}</span></td>
+      <td style="white-space:nowrap" onclick="event.stopPropagation()">
+        <button class="btn-sm btn-edit" onclick="editATL(${a.id})">Edit</button>
+        <button class="btn-sm btn-del" onclick="delATL(${a.id})">Del</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--asl-grey);padding:20px">No ATL entries</td></tr>';
+  return `
+  <div class="module-header">
+    <div><div class="module-title">Aircraft Technical Log</div><div class="module-subtitle">${db.atl.length} entries</div></div>
+    <button class="btn-primary" onclick="addATL()">+ New ATL Entry</button>
+  </div>
+  <div class="filter-bar">
+    ${['all','open','closed'].map(f=>`<button class="filter-btn ${atlFilter===f?'active':''}" onclick="atlFilter='${f}';showView('atl')">${f.toUpperCase()}</button>`).join('')}
+    <input class="filter-search" placeholder="Search ATL, reg..." oninput="atlSearch=this.value.toLowerCase();showView('atl')" value="${atlSearch}">
+  </div>
+  <div style="overflow-x:auto">
+  <table class="data-table">
+    <thead><tr><th>ATL Number</th><th>A/C Reg</th><th>Pilot Report</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function openATLDetail(id) {
+  const a = db.atl.find(x=>x.id===id); if(!a) return;
+  openModal(`
+  <div class="modal-title">${a.atl_number} <button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="detail-section">
+    <div class="detail-grid">
+      <div class="detail-item"><label>ATL Number</label><div class="val">${a.atl_number}</div></div>
+      <div class="detail-item"><label>A/C Registration</label><div class="val"><span class="reg-tag">${a.aircraft_reg}</span></div></div>
+      <div class="detail-item"><label>Date</label><div class="val">${a.created_at}</div></div>
+      <div class="detail-item"><label>Status</label><div class="val"><span class="status-tag s-${a.status}">${a.status}</span></div></div>
+    </div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">Pilot Report</div>
+    <div class="detail-item"><div class="val">${a.pilot_report}</div></div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">Certifying Action</div>
+    <div class="detail-item"><div class="val">${a.certifying_action}</div></div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">CRS / Release Statement</div>
+    <div class="detail-item"><div class="val" style="color:var(--asl-success)">${a.crs}</div></div>
+  </div>
+  <div class="form-actions">
+    <button class="btn-cancel" onclick="closeModal()">Close</button>
+    <button class="btn-primary" onclick="closeModal();editATL(${a.id})">Edit</button>
+  </div>`);
+}
+
+function addATL() { openATLForm(); }
+function editATL(id) { openATLForm(db.atl.find(a=>a.id===id)); }
+
+function openATLForm(a=null) {
+  const isEdit = !!a;
+  const f = a || {id:null,atl_number:'ATL-'+randWO(),pilot_report:'',certifying_action:'',crs:'CRS issued: Work carried out in accordance with AMM. Aircraft released to service by authorised certifying staff. AME Lic B1.1 – EASA.145.0419.',aircraft_reg:'EI-HAG',created_at:today(),status:'open'};
+  const regs = db.aircraft.map(a=>a.registration);
+  openModal(`
+  <div class="modal-title">${isEdit?'Edit ATL':'New ATL Entry'}<button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="form-grid">
+    <div class="form-group"><label>ATL Number</label><input id="fa-num" value="${f.atl_number}"></div>
+    <div class="form-group"><label>A/C Registration</label>
+      <select id="fa-reg">${regs.map(r=>`<option ${f.aircraft_reg===r?'selected':''}>${r}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>Date</label><input type="date" id="fa-dt" value="${f.created_at}"></div>
+    <div class="form-group"><label>Status</label>
+      <select id="fa-sta">${['open','closed'].map(s=>`<option ${f.status===s?'selected':''}>${s}</option>`).join('')}</select>
+    </div>
+    <div class="form-group full"><label>Pilot Report</label><textarea id="fa-pr" style="min-height:80px">${f.pilot_report}</textarea></div>
+    <div class="form-group full"><label>Certifying Action</label><textarea id="fa-ca" style="min-height:100px">${f.certifying_action}</textarea></div>
+    <div class="form-group full"><label>CRS / Release Statement</label><textarea id="fa-crs" style="min-height:80px">${f.crs}</textarea></div>
+  </div>
+  <div class="form-actions">
+    ${isEdit?`<button class="btn-sm btn-del" onclick="delATL(${f.id})">Delete</button>`:''}
+    <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    <button class="btn-primary" onclick="saveATL(${f.id||'null'})">Save</button>
+  </div>`);
+}
+
+function saveATL(id) {
+  const data = {
+    atl_number: document.getElementById('fa-num').value,
+    aircraft_reg: document.getElementById('fa-reg').value,
+    created_at: document.getElementById('fa-dt').value,
+    status: document.getElementById('fa-sta').value,
+    pilot_report: document.getElementById('fa-pr').value,
+    certifying_action: document.getElementById('fa-ca').value,
+    crs: document.getElementById('fa-crs').value,
+  };
+  if (id) { Object.assign(db.atl.find(a=>a.id===id), data); }
+  else { db.atl.push({id:uid('atl'), ...data}); }
+  closeModal(); showView('atl'); showToast('ATL entry saved', 'success');
+}
+function delATL(id) {
+  if(confirm('Delete ATL entry?')) { db.atl = db.atl.filter(a=>a.id!==id); closeModal(); showView('atl'); showToast('ATL deleted'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HIL
+// ═══════════════════════════════════════════════════════════
+function renderHIL() {
+  const filtered = db.hil.filter(h => {
+    const matchFilter = hilFilter==='all' || h.status===hilFilter ||
+      (hilFilter==='deferred' && (!h.status || h.status==='deferred'));
+    const matchSearch = !hilSearch || h.hil_number.includes(hilSearch) || h.aircraft_reg.includes(hilSearch) || h.title.toLowerCase().includes(hilSearch);
+    return matchFilter && matchSearch;
+  });
+  const rows = filtered.map(h => {
+    const days = Math.ceil((new Date(h.deadline) - new Date(T)) / 86400000);
+    const cls = days <= 3 ? 'deadline-urgent' : days <= 5 ? 'deadline-warn' : 'deadline-ok';
+    return `<tr onclick="openHILDetail(${h.id})" style="cursor:pointer">
+      <td><b>${h.hil_number}</b></td>
+      <td>${h.ata}</td>
+      <td><span class="reg-tag">${h.aircraft_reg}</span></td>
+      <td>${h.title}</td>
+      <td>${h.mel_cat ? 'MEL '+h.mel_cat : 'NO MEL'}</td>
+      <td>${h.deadline} <span class="${cls}">(${days}d)</span></td>
+      <td><span class="status-tag s-deferred">Deferred</span></td>
+      <td style="white-space:nowrap" onclick="event.stopPropagation()">
+        <button class="btn-sm btn-edit" onclick="editHIL(${h.id})">Edit</button>
+        <button class="btn-sm btn-del" onclick="delHIL(${h.id})">Del</button>
+      </td>
+    </tr>`;}).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--asl-grey);padding:20px">No HIL items</td></tr>';
+  return `
+  <div class="module-header">
+    <div><div class="module-title">HIL – Deferred Items</div><div class="module-subtitle">${db.hil.length} active deferrals</div></div>
+    <button class="btn-primary" onclick="addHIL()">+ New HIL</button>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn ${hilFilter==='all'?'active':''}" onclick="hilFilter='all';showView('hil')">ALL</button>
+    <button class="filter-btn ${hilFilter==='deferred'?'active':''}" onclick="hilFilter='deferred';showView('hil')">DEFERRED</button>
+    <input class="filter-search" placeholder="Search HIL, reg, title..." oninput="hilSearch=this.value.toLowerCase();showView('hil')" value="${hilSearch}">
+  </div>
+  <div style="overflow-x:auto">
+  <table class="data-table">
+    <thead><tr><th>HIL Number</th><th>ATA</th><th>A/C Reg</th><th>Title</th><th>MEL</th><th>Deadline</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function openHILDetail(id) {
+  const h = db.hil.find(x=>x.id===id); if(!h) return;
+  const days = Math.ceil((new Date(h.deadline) - new Date(T)) / 86400000);
+  const cls = days <= 3 ? 'deadline-urgent' : days <= 5 ? 'deadline-warn' : 'deadline-ok';
+  openModal(`
+  <div class="modal-title">${h.hil_number} <button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="detail-section">
+    <div class="detail-section-title">Identification</div>
+    <div class="detail-grid">
+      <div class="detail-item"><label>HIL Number</label><div class="val">${h.hil_number}</div></div>
+      <div class="detail-item"><label>A/C Reg</label><div class="val"><span class="reg-tag">${h.aircraft_reg}</span></div></div>
+      <div class="detail-item"><label>ATA</label><div class="val">${h.ata}</div></div>
+      <div class="detail-item"><label>ATL / WO Ref</label><div class="val">${h.atl_wo_ref}</div></div>
+      <div class="detail-item"><label>Deadline</label><div class="val"><span class="${cls}">${h.deadline} (${days} days remaining)</span></div></div>
+      <div class="detail-item"><label>Signature</label><div class="val" style="color:var(--asl-success)">${h.signature||'—'}</div></div>
+    </div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">Defect Details</div>
+    <div class="detail-item" style="margin-bottom:8px"><label>Title</label><div class="val">${h.title}</div></div>
+    <div class="detail-item" style="margin-bottom:8px"><label>Description</label><div class="val">${h.description}</div></div>
+    <div class="detail-item"><label>Reason for Deferral</label><div class="val">${h.reason}</div></div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">MEL Reference</div>
+    <div class="detail-grid">
+      <div class="detail-item"><label>Category</label><div class="val">CAT ${h.mel_cat}</div></div>
+      <div class="detail-item"><label>MEL Ref</label><div class="val">${h.mel_ref}</div></div>
+      <div class="detail-item"><label>ATA-Item-Sub-Point</label><div class="val">${h.mel_ata}-${h.mel_item}-${h.mel_sub}-${h.mel_point}</div></div>
+      <div class="detail-item"><label>Interval FH / DY</label><div class="val">${h.interval_fh} FH / ${h.interval_dy} DY</div></div>
+    </div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">Solution / Reply</div>
+    <div class="detail-item" style="margin-bottom:8px"><label>Solution</label><div class="val">${h.reply_solution||'—'}</div></div>
+    <div class="detail-grid">
+      <div class="detail-item"><label>Station</label><div class="val">${h.reply_station||'—'}</div></div>
+      <div class="detail-item"><label>Reply Date</label><div class="val">${h.reply_date||'—'}</div></div>
+      <div class="detail-item"><label>Reply Signature</label><div class="val" style="color:var(--asl-success)">${h.reply_sig||'—'}</div></div>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn-cancel" onclick="closeModal()">Close</button>
+    <button class="btn-primary" onclick="closeModal();editHIL(${h.id})">Edit</button>
+  </div>`);
+}
+
+function addHIL() { openHILForm(); }
+function editHIL(id) { openHILForm(db.hil.find(h=>h.id===id)); }
+
+function openHILForm(h=null) {
+  const isEdit = !!h;
+  const f = h || {id:null,hil_number:'HIL-'+randWO(),ata:'',title:'',description:'',aircraft_reg:'EI-HAG',atl_wo_ref:'',reason:'',mel_cat:'B',mel_ref:'',mel_ata:'',mel_item:'',mel_sub:'',mel_point:'',interval_fh:'0',interval_dy:'3',deadline:addDays(today(),3),signature:'',reply_solution:'',reply_station:'BRU',reply_date:'',reply_sig:''};
+  const regs = db.aircraft.map(a=>a.registration);
+  openModal(`
+  <div class="modal-title">${isEdit?'Edit HIL '+f.hil_number:'New HIL Entry'}<button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="form-grid">
+    <div class="form-group"><label>HIL Number</label><input id="fh-num" value="${f.hil_number}"></div>
+    <div class="form-group"><label>A/C Registration</label>
+      <select id="fh-reg">${regs.map(r=>`<option ${f.aircraft_reg===r?'selected':''}>${r}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>ATA</label><input id="fh-ata" value="${f.ata}"></div>
+    <div class="form-group"><label>ATL / WO Ref</label><input id="fh-ref" value="${f.atl_wo_ref}"></div>
+    <div class="form-group full"><label>Title</label><input id="fh-title" value="${f.title}"></div>
+    <div class="form-group full"><label>Description</label><textarea id="fh-desc">${f.description}</textarea></div>
+    <div class="form-group full"><label>Reason for Deferral</label><textarea id="fh-reason">${f.reason}</textarea></div>
+    <div class="form-group"><label>MEL Category</label>
+      <select id="fh-mcat">${['A','B','C','D'].map(c=>`<option ${f.mel_cat===c?'selected':''}>${c}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>MEL Reference</label><input id="fh-mref" value="${f.mel_ref}"></div>
+    <div class="form-group"><label>MEL ATA</label><input id="fh-mata" value="${f.mel_ata}"></div>
+    <div class="form-group"><label>Item</label><input id="fh-mitm" value="${f.mel_item}"></div>
+    <div class="form-group"><label>Sub-Item</label><input id="fh-msub" value="${f.mel_sub}"></div>
+    <div class="form-group"><label>Point</label><input id="fh-mpt" value="${f.mel_point}"></div>
+    <div class="form-group"><label>Interval FH</label><input id="fh-ifh" value="${f.interval_fh}"></div>
+    <div class="form-group"><label>Interval DY</label><input id="fh-idy" value="${f.interval_dy}"></div>
+    <div class="form-group"><label>Deadline</label><input type="date" id="fh-dl" value="${f.deadline}"></div>
+    <div class="form-group full">
+      <label>Signature</label>
+      <button class="sig-btn ${f.signature?'sig-applied':''}" id="fh-sigbtn" onclick="applySig('fh-sig','fh-sigbtn')" type="button">
+        ${f.signature ? '✔ '+f.signature : '✎ Apply Signature MccPab26'}
+      </button>
+      <input type="hidden" id="fh-sig" value="${f.signature}">
+    </div>
+    <div class="form-group full" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:14px"><label>Solution / Reply</label><textarea id="fh-reply">${f.reply_solution}</textarea></div>
+    <div class="form-group"><label>Station</label><input id="fh-sta" value="${f.reply_station}"></div>
+    <div class="form-group"><label>Reply Date</label><input type="date" id="fh-rdt" value="${f.reply_date}"></div>
+    <div class="form-group full">
+      <label>Reply Signature</label>
+      <button class="sig-btn ${f.reply_sig?'sig-applied':''}" id="fh-rsigbtn" onclick="applySig('fh-rsig','fh-rsigbtn')" type="button">
+        ${f.reply_sig ? '✔ '+f.reply_sig : '✎ Apply Reply Signature'}
+      </button>
+      <input type="hidden" id="fh-rsig" value="${f.reply_sig}">
+    </div>
+  </div>
+  <div class="form-actions">
+    ${isEdit?`<button class="btn-sm btn-del" onclick="delHIL(${f.id})">Delete</button>`:''}
+    <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    <button class="btn-primary" onclick="saveHIL(${f.id||'null'})">Save</button>
+  </div>`);
+}
+
+function saveHIL(id) {
+  const data = {
+    hil_number: document.getElementById('fh-num').value,
+    aircraft_reg: document.getElementById('fh-reg').value,
+    ata: document.getElementById('fh-ata').value,
+    atl_wo_ref: document.getElementById('fh-ref').value,
+    title: document.getElementById('fh-title').value,
+    description: document.getElementById('fh-desc').value,
+    reason: document.getElementById('fh-reason').value,
+    mel_cat: document.getElementById('fh-mcat').value,
+    mel_ref: document.getElementById('fh-mref').value,
+    mel_ata: document.getElementById('fh-mata').value,
+    mel_item: document.getElementById('fh-mitm').value,
+    mel_sub: document.getElementById('fh-msub').value,
+    mel_point: document.getElementById('fh-mpt').value,
+    interval_fh: document.getElementById('fh-ifh').value,
+    interval_dy: document.getElementById('fh-idy').value,
+    deadline: document.getElementById('fh-dl').value,
+    signature: document.getElementById('fh-sig').value,
+    reply_solution: document.getElementById('fh-reply').value,
+    reply_station: document.getElementById('fh-sta').value,
+    reply_date: document.getElementById('fh-rdt').value,
+    reply_sig: document.getElementById('fh-rsig').value,
+  };
+  if (id) { Object.assign(db.hil.find(h=>h.id===id), data); }
+  else { db.hil.push({id:uid('hil'), ...data}); }
+  closeModal(); showView('hil'); showToast('HIL entry saved', 'success');
+}
+function delHIL(id) {
+  if(confirm('Delete HIL entry?')) { db.hil = db.hil.filter(h=>h.id!==id); closeModal(); showView('hil'); showToast('HIL deleted'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HISTORIAL
+// ═══════════════════════════════════════════════════════════
+function renderHistorial() {
+  const regs = [...new Set(db.historial.map(h=>h.aircraft_reg))];
+  let html = `
+  <div class="module-header">
+    <div><div class="module-title">Aircraft Defect History</div><div class="module-subtitle">${db.historial.length} records · All fleet</div></div>
+    <button class="btn-primary" onclick="addHistorial()">+ New Record</button>
+  </div>`;
+  regs.forEach(reg => {
+    const items = db.historial.filter(h=>h.aircraft_reg===reg);
+    html += `<div style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span class="reg-tag" style="font-size:14px">${reg}</span>
+        <span style="font-size:11px;color:var(--asl-grey)">${items.length} records</span>
+      </div>`;
+    items.forEach(h => {
+      html += `<div class="hist-card">
+        <div class="hist-header" onclick="this.nextElementSibling.classList.toggle('open')">
+          <span class="reg-tag">${h.aircraft_reg}</span>
+          <span style="font-size:11px;color:var(--asl-grey)">${h.ata}</span>
+          <span style="flex:1;font-size:13px;font-weight:600;margin-left:8px">${h.title}</span>
+          <span style="font-size:11px;color:var(--asl-grey)">${h.date}</span>
+          <button class="btn-sm btn-edit" onclick="event.stopPropagation();editHistorial(${h.id})">Edit</button>
+          <button class="btn-sm btn-del" onclick="event.stopPropagation();delHistorial(${h.id})">Del</button>
+        </div>
+        <div class="hist-body">
+          <div class="hist-field"><label>Defect</label><div class="val">${h.defect}</div></div>
+          <div class="hist-field"><label>Corrective Action</label><div class="val">${h.corrective_action}</div></div>
+          <div class="hist-manual">
+            <div class="hist-manual-title">📖 Manual References</div>
+            <div style="font-size:12px">${h.manual_ref}</div>
+          </div>
+          <div class="hist-field" style="margin-top:10px"><label>Release to Service</label><div class="val" style="color:var(--asl-success)">${h.release}</div></div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  return html;
+}
+
+function addHistorial() { openHistorialForm(); }
+function editHistorial(id) { openHistorialForm(db.historial.find(h=>h.id===id)); }
+
+function openHistorialForm(h=null) {
+  const isEdit = !!h;
+  const f = h || {id:null,aircraft_reg:'EI-HAG',date:today(),ata:'',title:'',defect:'',corrective_action:'',manual_ref:'',release:'CRS issued per AMM. Aircraft returned to service. EASA.145.0419.',status:'closed'};
+  const regs = db.aircraft.map(a=>a.registration);
+  openModal(`
+  <div class="modal-title">${isEdit?'Edit Record':'New History Record'}<button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="form-grid">
+    <div class="form-group"><label>A/C Registration</label>
+      <select id="fhi-reg">${regs.map(r=>`<option ${f.aircraft_reg===r?'selected':''}>${r}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>Date</label><input type="date" id="fhi-dt" value="${f.date}"></div>
+    <div class="form-group"><label>ATA</label><input id="fhi-ata" value="${f.ata}"></div>
+    <div class="form-group full"><label>Title</label><input id="fhi-title" value="${f.title}"></div>
+    <div class="form-group full"><label>Defect</label><textarea id="fhi-def">${f.defect}</textarea></div>
+    <div class="form-group full"><label>Corrective Action</label><textarea id="fhi-ca" style="min-height:100px">${f.corrective_action}</textarea></div>
+    <div class="form-group full"><label>Manual References</label><textarea id="fhi-man">${f.manual_ref}</textarea></div>
+    <div class="form-group full"><label>Release to Service / CRS</label><textarea id="fhi-rel">${f.release}</textarea></div>
+  </div>
+  <div class="form-actions">
+    ${isEdit?`<button class="btn-sm btn-del" onclick="delHistorial(${f.id})">Delete</button>`:''}
+    <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    <button class="btn-primary" onclick="saveHistorial(${f.id||'null'})">Save</button>
+  </div>`);
+}
+
+function saveHistorial(id) {
+  const data = {
+    aircraft_reg: document.getElementById('fhi-reg').value,
+    date: document.getElementById('fhi-dt').value,
+    ata: document.getElementById('fhi-ata').value,
+    title: document.getElementById('fhi-title').value,
+    defect: document.getElementById('fhi-def').value,
+    corrective_action: document.getElementById('fhi-ca').value,
+    manual_ref: document.getElementById('fhi-man').value,
+    release: document.getElementById('fhi-rel').value,
+    status: 'closed',
+  };
+  if (id) { Object.assign(db.historial.find(h=>h.id===id), data); }
+  else { const newId = Math.max(...db.historial.map(h=>h.id))+1; db.historial.push({id:newId, ...data}); }
+  closeModal(); showView('historial'); showToast('Record saved', 'success');
+}
+function delHistorial(id) {
+  if(confirm('Delete this record?')) { db.historial = db.historial.filter(h=>h.id!==id); closeModal(); showView('historial'); showToast('Record deleted'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SERVICE WORKER REGISTRATION
+// ═══════════════════════════════════════════════════════════
+let swReg = null;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js').then(reg => {
+    swReg = reg;
+    console.log('SW registered');
+  }).catch(e => console.log('SW error', e));
+}
+
+// ═══════════════════════════════════════════════════════════
+// SCHEDULER
+// ═══════════════════════════════════════════════════════════
+let schedules = [];
+let schedTimers = [];
+
+function renderScheduler() {
+  const rows = schedules.length ? schedules.map((s,i) => `
+    <tr>
+      <td>${s.time}</td>
+      <td>${s.title}</td>
+      <td>${s.body}</td>
+      <td><span class="status-tag ${s.fired?'s-closed':'s-open'}">${s.fired?'Sent':'Pending'}</span></td>
+      <td><button class="btn-sm btn-del" onclick="deleteSchedule(${i})">Del</button></td>
+    </tr>`).join('') :
+    '<tr><td colspan="5" style="text-align:center;color:var(--asl-grey);padding:20px">No notifications scheduled</td></tr>';
+
+  return `
+  <div class="module-header">
+    <div>
+      <div class="module-title">🔔 Notification Scheduler</div>
+      <div class="module-subtitle">Schedule notifications for your iPhone lock screen</div>
+    </div>
+  </div>
+
+  <div class="detail-section" style="margin-bottom:20px">
+    <div class="detail-section-title">How to activate</div>
+    <div style="font-size:12px;line-height:1.8;color:var(--asl-grey)">
+      1. Open this page in Safari on iPhone → Share → <b style="color:var(--asl-white)">Add to Home Screen</b><br>
+      2. Open the app from your home screen (not Safari directly)<br>
+      3. When prompted, tap <b style="color:var(--asl-accent)">Allow</b> notifications<br>
+      4. Schedule your notifications below — they will appear on your lock screen
+    </div>
+  </div>
+
+  <div class="dash-card" style="margin-bottom:20px">
+    <div class="dash-card-header"><span class="dash-card-title">New Notification</span></div>
+    <div class="form-grid" style="margin-bottom:14px">
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="sch-time">
+      </div>
+      <div class="form-group">
+        <label>Title (e.g. 📞 Llamada de Jerry)</label>
+        <input type="text" id="sch-title" placeholder="📞 Llamada de Jerry">
+      </div>
+      <div class="form-group full">
+        <label>Message (optional)</label>
+        <input type="text" id="sch-body" placeholder="ASL Tech Support">
+      </div>
+    </div>
+    <button class="btn-primary" id="sch-add-btn">+ Add Notification</button>
+    <div id="notif-permission" style="margin-top:12px;font-size:12px;color:var(--asl-grey)"></div>
+  </div>
+
+  <div style="overflow-x:auto">
+  <table class="data-table">
+    <thead><tr><th>Time</th><th>Title</th><th>Message</th><th>Status</th><th>Del</th></tr></thead>
+    <tbody id="sch-rows">${rows}</tbody>
+  </table></div>`;
+}
+
+function bindScheduler() {
+  document.getElementById('sch-add-btn').addEventListener('click', addSchedule);
+  checkNotifPermission();
+}
+
+function checkNotifPermission() {
+  const el = document.getElementById('notif-permission');
+  if (!el) return;
+  if (!('Notification' in window)) {
+    el.innerHTML = '<span style="color:var(--asl-danger)">⚠ Notifications not supported in this browser. Use Safari and add to Home Screen.</span>';
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    el.innerHTML = '<span style="color:var(--asl-success)">✔ Notifications enabled</span>';
+  } else if (Notification.permission === 'denied') {
+    el.innerHTML = '<span style="color:var(--asl-danger)">✘ Notifications blocked. Enable in iPhone Settings → Safari → Notifications.</span>';
+  } else {
+    el.innerHTML = '<span style="color:var(--asl-warn)">⚠ Permission needed. <button class="btn-sm btn-edit" onclick="requestNotifPermission()">Enable Notifications</button></span>';
+  }
+}
+
+function requestNotifPermission() {
+  Notification.requestPermission().then(p => {
+    checkNotifPermission();
+    if (p === 'granted') showToast('Notifications enabled!', 'success');
+  });
+}
+
+function addSchedule() {
+  const time = document.getElementById('sch-time').value;
+  const title = document.getElementById('sch-title').value.trim();
+  const body = document.getElementById('sch-body').value.trim() || 'ASL Tech Support';
+
+  if (!time) { showToast('Select a time', 'error'); return; }
+  if (!title) { showToast('Enter a title', 'error'); return; }
+
+  const now = new Date();
+  const [h, m] = time.split(':').map(Number);
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+  if (target <= now) target.setDate(target.getDate() + 1); // next day if past
+  const delay = target - now;
+
+  const entry = { time, title, body, fired: false, target: target.toISOString() };
+  schedules.push(entry);
+  const idx = schedules.length - 1;
+
+  // Schedule via SW if available, else fallback to setTimeout
+  if (swReg && Notification.permission === 'granted') {
+    swReg.active.postMessage({ type: 'SCHEDULE', title, body, delay });
+  } else if (Notification.permission === 'granted') {
+    schedTimers.push(setTimeout(() => {
+      new Notification(title, { body, icon: './ASL_icon.png' });
+      schedules[idx].fired = true;
+    }, delay));
+  } else {
+    requestNotifPermission();
+  }
+
+  const mins = Math.round(delay / 60000);
+  showToast(`Scheduled in ${mins} min`, 'success');
+  showView('scheduler');
+}
+
+function deleteSchedule(i) {
+  schedules.splice(i, 1);
+  showView('scheduler');
+  showToast('Deleted', 'success');
+}
+
+const departments = [
+  { dept:'Captain Office', ext:'+32 4 220 1101', icon:'✈' },
+  { dept:'Maintenance Manager', ext:'+32 4 220 1127', icon:'🔧' },
+  { dept:'Line MTO', ext:'+32 4 220 1154', icon:'🛠' },
+  { dept:'Engineering', ext:'+32 4 220 1182', icon:'📐' },
+  { dept:'Stores', ext:'+32 4 220 1196', icon:'📦' },
+  { dept:'MCC', ext:'+32 4 220 1173', icon:'🖥' },
+];
+const personnel = [
+  { name:'Manon', role:'Captain', phone:'+32 478 64 19 35', icon:'✈' },
+  { name:'Koen', role:'Maintenance Manager', phone:'+32 496 82 57 14', icon:'🔧' },
+  { name:'Bram', role:'Line MTO Manager', phone:'+32 471 35 84 92', icon:'🛠' },
+  { name:'Sofie', role:'Engineering Manager', phone:'+32 489 17 63 58', icon:'📐' },
+  { name:'Elise', role:'Stores Manager', phone:'+32 465 91 42 76', icon:'📦' },
+  { name:'Mathias', role:'MCC', phone:'+32 497 28 75 61', icon:'🖥' },
+];
+
+function renderContacts() {
+  const deptCards = departments.map(d => `
+    <div class="contact-card">
+      <div class="contact-avatar">${d.icon}</div>
+      <div>
+        <div class="contact-name">${d.dept}</div>
+        <div class="contact-role">Department Extension</div>
+      </div>
+      <div class="contact-phone">${d.ext}</div>
+    </div>`).join('');
+  const persCards = personnel.map(p => `
+    <div class="contact-card">
+      <div class="contact-avatar">${p.icon}</div>
+      <div>
+        <div class="contact-name">${p.name}</div>
+        <div class="contact-role">${p.role}</div>
+      </div>
+      <div class="contact-phone">${p.phone}</div>
+    </div>`).join('');
+  return `
+  <div class="module-title" style="margin-bottom:20px">Contacts</div>
+  <div class="contacts-section">
+    <div class="contacts-title">🏢 Department Extensions</div>
+    ${deptCards}
+  </div>
+  <div class="contacts-section">
+    <div class="contacts-title">👥 Key Personnel</div>
+    ${persCards}
+  </div>`;
+}
+</script>
+</body>
+</html>
