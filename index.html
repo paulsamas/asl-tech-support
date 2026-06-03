@@ -696,9 +696,17 @@ let db = {
   notes: '',
 };
 
+const STORAGE_KEY = 'asl_tech_support_db';
+function saveDB(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(e){console.error('Save error',e);}}
+function loadDB(){try{const saved=localStorage.getItem(STORAGE_KEY);if(saved) db=JSON.parse(saved);}catch(e){console.error('Load error',e);}}
+loadDB();
+setInterval(saveDB,1000);
+
+
 // Save notes to localStorage when changed
 function saveNotes() {
   db.notes = document.getElementById('notesArea').value;
+  saveDB();
   showToast('Notes saved', 'success');
 }
 
