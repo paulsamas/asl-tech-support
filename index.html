@@ -10,25 +10,25 @@
 <!-- 10 modules: Dashboard · Aircraft · WO · ATL · HIL · Historial · Contactos · Email · Reports · Scheduler -->
 <!-- Versioning convention (NOVARA-style): filename + APP_VERSION in code. GitHub file stays index.html -->
 <link rel="manifest" href="/asl-tech-support/manifest.json">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1628'/%3E%3Cpolygon points='6,32 22,12 28,12 12,32 28,52 22,52' fill='%23f26522'/%3E%3Cpolygon points='14,32 28,15 33,15 19,32 33,49 28,49' fill='%23e8a020' opacity='.75'/%3E%3Ctext x='34' y='38' font-family='Arial Black,Arial' font-size='18' font-weight='900' fill='%23f0f4fa' letter-spacing='1'%3EASL%3C/text%3E%3Crect x='34' y='41' width='26' height='2' fill='%23e8a020' opacity='.6'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1f44'/%3E%3Cpath d='M0 126 Q45 104 90 122 Q135 140 180 118 L180 150 Q135 170 90 150 Q45 132 0 152 Z' fill='%23f5b914'/%3E%3Ctext x='90' y='100' font-family='Arial Black,Arial' font-size='64' font-weight='900' fill='%23f0f4fa' letter-spacing='3' text-anchor='middle'%3EST%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23003566'/%3E%3Cpath d='M0 40 Q16 32 32 40 Q48 48 64 40 L64 54 Q48 62 32 54 Q16 46 0 54Z' fill='%23ffd60a'/%3E%3Ctext x='32' y='35' font-family='Arial Black,Arial' font-size='20' font-weight='900' fill='%23ffffff' text-anchor='middle'%3EST%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='14' fill='%23003566'/%3E%3Cpath d='M0 118 Q45 98 90 118 Q135 138 180 118 L180 148 Q135 168 90 148 Q45 128 0 148Z' fill='%23ffd60a'/%3E%3Ctext x='90' y='105' font-family='Arial Black,Arial' font-size='68' font-weight='900' fill='%23ffffff' letter-spacing='2' text-anchor='middle'%3EST%3C/text%3E%3C/svg%3E">
 <style>
 :root {
-  --asl-navy: #0a1f44;
-  --asl-blue: #143a7a;
-  --asl-mid: #0a52c4;
-  --asl-accent: #f5b914;
-  --asl-orange: #f59e0b;
-  --asl-light: #d4e4f7;
-  --asl-white: #f0f4fa;
-  --asl-grey: #8a9bb5;
-  --asl-dark: #061634;
+  --asl-navy: #003566;
+  --asl-blue: #004e9a;
+  --asl-mid: #0066cc;
+  --asl-accent: #ffd60a;
+  --asl-orange: #ffc300;
+  --asl-light: #cce0f5;
+  --asl-white: #f4f8fc;
+  --asl-grey: #7a8fa8;
+  --asl-dark: #001d3d;
   --asl-success: #1db87a;
   --asl-danger: #e03e3e;
   --asl-warn: #e8a020;
   --asl-diff: #8b5cf6;
   --sidebar-w: 200px;
-  --font-main: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-main: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -113,7 +113,7 @@ body {
   gap: 16px; flex-shrink: 0;
 }
 .topbar-logo { display: flex; align-items: center; gap: 10px; }
-.topbar-logo svg { width: 80px; height: 28px; }
+.topbar-logo svg { width: 120px; height: 30px; }
 .topbar-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); }
 .topbar-title {
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
@@ -501,29 +501,26 @@ body {
   #topbar { padding: 0 12px; }
 }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <!-- ══ LOGIN ══ -->
 <div id="login-screen">
   <div class="login-bg-stripe"></div>
-  <div class="login-box">
+  <div class="login-box" style="background:#fff;border:1px solid #cce0f5;">
     <div class="login-logo">
-      <svg class="logo-svg" viewBox="0 0 200 70" xmlns="http://www.w3.org/2000/svg">
-        <!-- ASL Logo -->
-        <rect x="0" y="0" width="200" height="70" fill="transparent"/>
-        <!-- Orange chevron -->
-        <polygon points="5,35 30,10 40,10 15,35 40,60 30,60" fill="#f26522"/>
-        <polygon points="18,35 40,14 48,14 26,35 48,56 40,56" fill="#e8a020" opacity=".7"/>
-        <!-- ASL text -->
-        <text x="58" y="38" font-family="'Helvetica Neue',Arial,sans-serif" font-size="17" font-weight="900" fill="#f0f4fa" letter-spacing="1">SABENA</text>
-        <!-- Aviation Belgium -->
-        <text x="58" y="54" font-family="'Helvetica Neue',Arial,sans-serif" font-size="9" fill="#8a9bb5" letter-spacing="1.5">AVIATION BELGIUM</text>
-        <!-- accent line -->
-        <rect x="58" y="42" width="120" height="1.5" fill="#e8a020" opacity=".5"/>
+      <svg class="logo-svg" viewBox="0 0 220 74" xmlns="http://www.w3.org/2000/svg">
+        <!-- SABENA Technics wordmark: bold blue text + yellow wave -->
+        <text x="0" y="44" font-family="'Inter','Arial Black',Arial,sans-serif"
+              font-size="40" font-weight="900" fill="#003566" letter-spacing="-1">SABENA</text>
+        <path d="M0 50 Q27 42 55 50 Q82 58 110 50 Q137 42 165 50 Q192 58 220 50 L220 60 Q192 68 165 60 Q137 52 110 60 Q82 68 55 60 Q27 52 0 60 Z" fill="#ffd60a"/>
+        <text x="2" y="73" font-family="'Inter','Arial Black',Arial,sans-serif"
+              font-size="11" font-weight="700" fill="#004e9a" letter-spacing="5">TECHNICS</text>
       </svg>
     </div>
-    <div class="login-subtitle">Technical Support Platform</div>
+    <div class="login-subtitle" style="color:#003566;font-weight:700;letter-spacing:3px;font-size:10px;margin-top:4px;text-transform:uppercase;">Technical Support Platform</div>
     <div class="login-field">
       <label>Username</label>
       <input type="text" id="inp-user" placeholder="Enter username" autocomplete="off">
@@ -542,10 +539,12 @@ body {
   <!-- Topbar -->
   <div id="topbar">
     <div class="topbar-logo">
-      <svg viewBox="0 0 80 28" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="2,14 12,4 16,4 6,14 16,24 12,24" fill="#f26522"/>
-        <polygon points="7,14 16,5.5 19,5.5 10,14 19,22.5 16,22.5" fill="#e8a020" opacity=".7"/>
-        <text x="22" y="18" font-family="'Helvetica Neue',Arial" font-size="10" font-weight="900" fill="#f0f4fa" letter-spacing="0.5">SABENA</text>
+      <svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="18" font-family="'Inter','Arial Black',Arial"
+              font-size="16" font-weight="900" fill="#ffffff" letter-spacing="-0.5">SABENA</text>
+        <path d="M0 22 Q15 18 30 22 Q45 26 60 22 Q75 18 90 22 Q105 26 120 22 L120 27 Q105 31 90 27 Q75 23 60 27 Q45 31 30 27 Q15 23 0 27 Z" fill="#ffd60a"/>
+        <text x="1" y="30" font-family="'Inter','Arial Black',Arial"
+              font-size="6" font-weight="700" fill="#ffd60a" letter-spacing="3">TECHNICS</text>
       </svg>
     </div>
     <div class="topbar-divider"></div>
