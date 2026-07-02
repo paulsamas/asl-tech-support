@@ -772,7 +772,7 @@ async function sbPull() {
 async function sbPush() {
   setSync('syncing');
   try {
-    const body = JSON.stringify({ id: SB_ROW, data: db, updated_at: new Date().toISOString() });
+    const body = JSON.stringify({ id: SB_ROW, data: { v: APP_VERSION, db: db }, updated_at: new Date().toISOString() });
     const r = await fetch(SB_URL + '/rest/v1/' + SB_TABLE,
       { method: 'POST', headers: SB_HEADERS, body });
     setSync(r.ok ? 'synced' : 'error');
@@ -794,9 +794,18 @@ async function sbDeleteRow() {
 async function startSync() {
   setSync('syncing');
   const remote = await sbPull();
-  if (remote === undefined) { setSync('offline'); return; }
-  if (remote === null) { await sbPush(); return; }
-  Object.keys(remote).forEach(k => { if (db[k]) db[k] = remote[k]; });
+  if (remote === undefined) { setSync('offline'); return; }   // offline: keep local
+  if (remote === null) { await sbPush(); return; }            // no remote row yet: seed it
+
+  // Versioned payload { v, db }. Legacy rows (raw db, no v) are treated as version-mismatch.
+  const remoteVer = (remote && typeof remote === 'object' && 'v' in remote) ? remote.v : null;
+  const remoteDb  = (remoteVer !== null) ? remote.db : remote;
+
+  // If the remote snapshot is from a different app version, it is stale relative to the
+  // current seed: discard it and push the current (new-version) data instead.
+  if (remoteVer !== APP_VERSION) { await sbPush(); showView(currentView); return; }
+
+  Object.keys(remoteDb).forEach(k => { if (db[k]) db[k] = remoteDb[k]; });
   saveDB();
   showView(currentView);
   setSync('synced');
